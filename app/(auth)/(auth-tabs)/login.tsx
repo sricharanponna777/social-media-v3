@@ -1,44 +1,58 @@
-import { View } from "@/components/ui/view";
-import { Text } from "@/components/ui/text";
-import { GroupedInput, GroupedInputItem } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useRouter } from "expo-router";
-import { useToast } from "@/components/ui/toast";
-import { LogBox, Pressable } from "react-native";
-import React, { useState } from "react";
-import apiService from "@/lib/api";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
+
+import apiService from '@/lib/api';
+import {
+  User,
+  Mail,
+  Lock,
+  Phone,
+  Eye,
+  EyeOff,
+  Plus,
+} from 'lucide-react-native';
+import React, { useState } from 'react';
+import { GroupedInput, GroupedInputItem } from '@/components/ui/input';
+import { View } from '@/components/ui/view';
+import { Button } from '@/components/ui/button';
+import { Pressable, LogBox } from 'react-native';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { useToast } from '@/components/ui/toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+let colorScheme1;
 
 interface LoginFields {
   email: string;
   password: string;
 }
 
-export default function LoginScreen() {
+export default function Login() {
   const colorScheme = useColorScheme();
+  colorScheme1 = colorScheme;
   const router = useRouter();
   const { success, error } = useToast();
   const loginSuccessToast = () => {
     success(
-      "Login Successful"
+      'Login Successful'
     );
   };
 
-  const loginErrorToast = () => {
+  const loginErrorToast = (err: string) => {
     error(
-      "Login Error"
+      'Login Error',
+      err
     );
   };
   LogBox.ignoreAllLogs();
   const [loginFields, setLoginFields] = useState<LoginFields>({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const muted = useThemeColor({}, "mutedForeground");
+  const muted = useThemeColor({}, 'mutedForeground');
 
   const updateField = <T extends keyof LoginFields>(
     field: T,
@@ -48,11 +62,14 @@ export default function LoginScreen() {
   };
 
   const isFormValid = Object.values(loginFields).every(
-    (val) => val !== null && val !== ""
+    (val) => val !== null && val !== ''
   );
 
   const handleLogin = async () => {
-    const { email, password } = loginFields;
+    const {
+      email,
+      password
+    } = loginFields;
 
     if (!isFormValid) return;
 
@@ -61,72 +78,59 @@ export default function LoginScreen() {
         email,
         password,
       });
-      console.log("Login response:", response);
+      console.log('Login response:', response);
       loginSuccessToast();
-    } catch (error) {
-      console.error("Login error:", error);
-      loginErrorToast();
+      await AsyncStorage.setItem('token', response.token);
+    } catch (error: string | any) {
+      console.error('Login error:', error);
+      loginErrorToast(error)
     } finally {
       setLoginFields({
-        email: "",
-        password: "",
+        email: '',
+        password: ''
       });
-      router.replace("/(tabs)/feed");
+      router.replace('/feed');
     }
-  }
+  };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <View style={{ gap: 24, flex: 1, marginVertical: 24, marginHorizontal: 16 }}>
       <GroupedInput title="Login">
-        {/* Email */}
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          <View style={{ flex: 1 }}>
-            <GroupedInputItem
-              placeholder="Email"
-              value={loginFields.email}
-              onChangeText={(text) => updateField("email", text)}
-              icon={Mail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              spellCheck={false}
-            />
-          </View>
-        </View>
-
-        {/* Password */}
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          <View style={{ flex: 1 }}>
-            <GroupedInputItem
-              placeholder="Password"
-              value={loginFields.password}
-              onChangeText={(text) => updateField("password", text)}
-              icon={Lock}
-              secureTextEntry={!showPassword}
-              rightComponent={
-                <Pressable onPress={() => setShowPassword(!showPassword)}>
-                  {showPassword ? (
-                    <EyeOff size={22} color={muted} />
-                  ) : (
-                    <Eye size={22} color={muted} />
-            
-                  )}
-                </Pressable>
-              }
-            />
-          </View>
-        </View>
+      <GroupedInputItem
+          placeholder="Email"
+          value={loginFields.email}
+          onChangeText={(text) => updateField('email', text)}
+          icon={Mail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          spellCheck={false}
+      />
+      <GroupedInputItem
+          placeholder="Password"
+          value={loginFields.password}
+          onChangeText={(text) => updateField('password', text)}
+          icon={Lock}
+          secureTextEntry={!showPassword}
+          rightComponent={
+          <Pressable onPress={() => setShowPassword(!showPassword)}>
+              {showPassword ? (
+              <EyeOff size={22} color={muted} />
+              ) : (
+              <Eye size={22} color={muted} />
+              )}
+          </Pressable>
+          }
+      />
       </GroupedInput>
+
+
 
       <Button
         onPress={handleLogin}
         disabled={!isFormValid}
         style={{
           marginTop: 24,
-          backgroundColor: isFormValid
-            ? colorScheme === "dark"
-              ? "rgb(52, 199, 89)"
-              : "rgb(48, 209, 88)"
-            : "#ccc",
+          backgroundColor: isFormValid ? (colorScheme1 === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)') : '#ccc',
         }}
       >
         Login

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from '@/components/ui/view';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let colorScheme1;
 
@@ -13,6 +14,17 @@ export default function WelcomeScreen() {
   const router = useRouter();
   colorScheme1 = colorScheme;
   console.log('Color scheme:', colorScheme);
+  const checkToken = async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      router.replace('/feed');
+    }
+  }
+
+  useEffect(() => {
+    checkToken();
+  }, []);
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to Our App!</Text>

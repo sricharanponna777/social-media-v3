@@ -120,11 +120,6 @@ class ApiService {
         undefined,
         { 'Content-Type': 'application/json' }
       );
-
-      const token = response.token;
-      if (token) {
-        await SecureStore.setItemAsync('auth_token', token);
-      }
       return response;
     } catch (error) {
       console.error('OTP verification failed:', error);
