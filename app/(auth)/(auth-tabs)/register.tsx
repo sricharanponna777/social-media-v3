@@ -15,10 +15,12 @@ import { View } from '@/components/ui/view';
 import { Button } from '@/components/ui/button';
 import { Pressable, LogBox } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useToast } from '@/components/ui/toast';
 
+let colorScheme1;
 interface RegisterFields {
   username: string;
   email: string;
@@ -30,6 +32,8 @@ interface RegisterFields {
 }
 
 export default function Register() {
+  const colorScheme = useColorScheme();
+  colorScheme1 = colorScheme;
   const router = useRouter();
   const { success, error } = useToast();
   const registrationSuccessToast = () => {
@@ -225,7 +229,7 @@ export default function Register() {
         disabled={!isFormValid}
         style={{
           marginTop: 24,
-          backgroundColor: isFormValid ? '#57d46a' : '#ccc',
+          backgroundColor: isFormValid ? (colorScheme1 === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)') : '#ccc',
         }}
       >
         Register

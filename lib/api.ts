@@ -2,6 +2,11 @@ import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { API_URL } from "../constants";
 
+interface LoginData {
+  email: string;
+  password: string;
+}
+
 interface RegisterData {
   username: string;
   email: string;
@@ -80,11 +85,11 @@ class ApiService {
     );
   }
 
-  async loginUser(email: string, password: string) {
+  async loginUser(data: LoginData) {
     try {
       const response = await this.api.post(
         'api/users/login',
-        { email, password },
+        data,
         undefined,
         undefined,
         { 'Content-Type': 'application/json' }
