@@ -12,6 +12,12 @@ interface RegisterData {
   mobileNumber: string;
 }
 
+interface VerifyOtpData {
+  otp: string;
+  email: string | null;
+  phone: string | null;
+}
+
 class Api {
   private buildHeaders(token?: string, customHeaders?: any): any {
     return {
@@ -100,8 +106,27 @@ class ApiService {
     await SecureStore.deleteItemAsync('auth_token');
   }
 
-}
+  async verifyOtp(data: VerifyOtpData) {
+    try {
+      const response = await this.api.post(
+        'api/users/verify-otp',
+        data,
+        undefined,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
 
+      const token = response.token;
+      if (token) {
+        await SecureStore.setItemAsync('auth_token', token);
+      }
+      return response;
+    } catch (error) {
+      console.error('OTP verification failed:', error);
+      throw error;
+    }
+  }
+}
 
 const apiService = new ApiService();
 
