@@ -4,16 +4,13 @@ import { View } from "@/components/ui/view";
 import * as SecureStore from "expo-secure-store";
 import apiService from "@/lib/api";
 import { useRouter } from "expo-router";
-import { useDispatch, useSelector } from "react-redux";
-import { setToken } from "@/redux/reducers/authSlice";
-import { RootState, store } from "@/redux/store";
+import { useAuth } from "@/contexts/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function VerifyOTP() {
   const [otp, setOtp] = useState<string>('')
   const [error, setError] = useState<string>('')
-  const token = useSelector((state: RootState) => state.auth.token);
-  const dispatch = useDispatch();
+  const { setToken } = useAuth();
   
   const handleVerify = async (otp: string) => {
     try {
@@ -28,8 +25,9 @@ export default function VerifyOTP() {
       await SecureStore.deleteItemAsync('otp');
       await SecureStore.deleteItemAsync('email');
       await SecureStore.deleteItemAsync('phone')
-      AsyncStorage.setItem('auth_token', token ?? '');
-      console.log('Token:', token);
+      const authToken = response.data.token;
+      await setToken(authToken);
+      console.log('Token:', authToken);
       const router = useRouter()
       router.replace('/(tabs)/feed');
     } catch (errorr: any) {
