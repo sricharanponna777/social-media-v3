@@ -1,4 +1,3 @@
-
 import apiService from '@/lib/api';
 import {
   User,
@@ -17,7 +16,7 @@ import { Pressable, LogBox } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useToast } from '@/components/ui/toast';
 
 let colorScheme1;
@@ -98,9 +97,9 @@ export default function Register() {
         mobileNumber: mobileNumber?.toString() ?? '', 
       });
       console.log('Register response:', response);
-      await SecureStore.setItemAsync('otp', response.otp);
-      await SecureStore.setItemAsync('email', response.user.email);
-      await SecureStore.setItemAsync('phone', response.user.mobile_number);
+      await AsyncStorage.setItem('otp', response.otp);
+      await AsyncStorage.setItem('email', response.user.email);
+      await AsyncStorage.setItem('phone', response.user.mobile_number);
       registrationSuccessToast();
     } catch (error) {
       console.error('Register error:', error);

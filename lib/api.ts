@@ -20,7 +20,6 @@ interface RegisterData {
 interface VerifyOtpData {
   otp: string;
   email: string | null;
-  phone: string | null;
 }
 
 class Api {

@@ -1,30 +1,36 @@
 import { InputOTP } from "@/components/ui/input-otp";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View } from "@/components/ui/view";
-import * as SecureStore from "expo-secure-store";
 import apiService from "@/lib/api";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function VerifyOTP() {
+  let email: string | null = null;
+  let phone: string | null = null;
+  const fetchData = async () => {
+    email = await AsyncStorage.getItem('email');
+    phone = await AsyncStorage.getItem('phone');
+  }
+  fetchData().then(() => {
+    console.log('Email:', email);
+    console.log('Phone:', phone);
+  });
   const [otp, setOtp] = useState<string>('')
   const [error, setError] = useState<string>('')
   const { setToken } = useAuth();
   
   const handleVerify = async (otp: string) => {
     try {
-      const email = await SecureStore.getItemAsync('email');
-      const phone = await SecureStore.getItemAsync('phone');
       const response = await apiService.verifyOtp({
         otp,
-        email,
-        phone
+        email
       });
       console.log('Verify response:', response);
-      await SecureStore.deleteItemAsync('otp');
-      await SecureStore.deleteItemAsync('email');
-      await SecureStore.deleteItemAsync('phone')
+      await AsyncStorage.removeItem('otp');
+      await AsyncStorage.removeItem('email');
+      await AsyncStorage.removeItem('phone')
       const authToken = response.data.token;
       await setToken(authToken);
       console.log('Token:', authToken);

@@ -17,9 +17,8 @@ import { Pressable, LogBox } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import { useToast } from '@/components/ui/toast';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/contexts/AuthContext';
 
 let colorScheme1;
 
@@ -29,6 +28,7 @@ interface LoginFields {
 }
 
 export default function Login() {
+  const { setToken } = useAuth();
   const colorScheme = useColorScheme();
   colorScheme1 = colorScheme;
   const router = useRouter();
@@ -80,7 +80,7 @@ export default function Login() {
       });
       console.log('Login response:', response);
       loginSuccessToast();
-      await AsyncStorage.setItem('token', response.token);
+      setToken(response.token);
     } catch (error: string | any) {
       console.error('Login error:', error);
       loginErrorToast(error)

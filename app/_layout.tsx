@@ -31,10 +31,17 @@ function InnerLayout() {
           <ThemeProvider>
             {token ? (
               <SocketProvider token={token}>
-                <Stack screenOptions={{ headerShown: false }} />
+                <Stack
+                 screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                </Stack>
               </SocketProvider>
             ) : (
-              <Stack screenOptions={{ headerShown: false }} />
+              <Stack
+              screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="index" />
+              </Stack>
             )}
             <StatusBar style="auto" />
           </ThemeProvider>
