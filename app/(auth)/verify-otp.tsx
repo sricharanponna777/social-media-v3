@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { View } from "@/components/ui/view";
 import apiService from "@/lib/api";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/contexts/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function VerifyOTP() {
@@ -19,7 +18,6 @@ export default function VerifyOTP() {
   });
   const [otp, setOtp] = useState<string>('')
   const [error, setError] = useState<string>('')
-  const { setToken } = useAuth();
   
   const handleVerify = async (otp: string) => {
     try {
@@ -31,11 +29,10 @@ export default function VerifyOTP() {
       await AsyncStorage.removeItem('otp');
       await AsyncStorage.removeItem('email');
       await AsyncStorage.removeItem('phone')
-      const authToken = response.data.token;
-      await setToken(authToken);
+      const authToken = response.token;
       console.log('Token:', authToken);
       const router = useRouter()
-      router.replace('/(tabs)/feed');
+      router.replace('/(main)/(tabs)/feed');
     } catch (errorr: any) {
       if (errorr.response?.status === 401) {
         console.log('OTP is invalid');

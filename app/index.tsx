@@ -15,7 +15,7 @@ export default function WelcomeScreen() {
   colorScheme1 = colorScheme;
   console.log('Color scheme:', colorScheme);
   const checkToken = async () => {
-    const token = await AsyncStorage.getItem('token');
+    const token = await AsyncStorage.getItem('auth_token');
     if (token) {
       router.replace('/feed');
     }

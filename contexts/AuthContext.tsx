@@ -1,6 +1,7 @@
 // contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SocketProvider } from './SocketContext';
 
 type AuthContextType = {
   token: string | null;
@@ -16,11 +17,12 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
 });
 
-const TOKEN_KEY = 'token';
+const TOKEN_KEY = 'auth_token';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   // Load token from AsyncStorage on app start
   useEffect(() => {
@@ -60,7 +62,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ token, setToken, removeToken, isLoading }}>
-      {children}
+      {token && !isLoading ? (
+        <SocketProvider token={token}>
+          {children}
+        </SocketProvider>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

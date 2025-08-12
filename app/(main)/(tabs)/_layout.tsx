@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router'
+import { Tabs, useRouter } from 'expo-router'
 import React from 'react'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { View } from '@/components/ui/view'
@@ -7,11 +7,12 @@ import { Icon } from '@/components/ui/icon'
 import { AlignJustify, Bell, Ellipsis, Home, LogOut, MessageCircle, Pencil, Plus, Search, Settings, User, Users, Video } from 'lucide-react-native'
 import { Text } from '@/components/ui/text'
 import { TabsContent, TabsList, TabsTrigger, Tabs as TabsComponent } from '@/components/ui/tabs'
-
+import { useAuth } from '@/contexts/AuthContext'
 
 const TabLayout = () => {
   const colorScheme = useColorScheme()
-
+  const router = useRouter()
+  const { removeToken } = useAuth()
   return (
     <Tabs screenOptions={{ 
       headerShown: true,
@@ -20,7 +21,7 @@ const TabLayout = () => {
       tabBarInactiveTintColor: colorScheme === 'dark' ? 'white' : 'black',
     }}
     >
-        <Tabs.Screen name="feed" options={{ tabBarLabel: 'Feed', headerTitle: '', headerTransparent: true, headerLeft: () => (
+        <Tabs.Screen name="feed/index" options={{ tabBarLabel: 'Feed', headerTitle: '', headerTransparent: true, headerLeft: () => (
           <TouchableOpacity style={{ padding: 10 }}>
             <Text>Home</Text>
           </TouchableOpacity>
@@ -28,7 +29,7 @@ const TabLayout = () => {
           <Icon name={Home} size={size} color={color} />
         ), headerRight: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity style={{ padding: 10 }} onPress={() => router.push('/(main)/(create)/post')}>
             <Icon name={Plus} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
           </TouchableOpacity>
           <TouchableOpacity style={{ padding: 10 }}>
@@ -39,7 +40,7 @@ const TabLayout = () => {
           </TouchableOpacity>
         </View>
       )}} />
-        <Tabs.Screen name="friends" options={{ tabBarLabel: 'Friends', headerTitle: '', headerTransparent: true, headerLeft: () => (
+        <Tabs.Screen name="friends/index" options={{ tabBarLabel: 'Friends', headerTitle: '', headerTransparent: true, headerLeft: () => (
           <TouchableOpacity style={{ padding: 10 }}>
             <Text>Friends</Text>
           </TouchableOpacity>
@@ -50,7 +51,7 @@ const TabLayout = () => {
         ), tabBarIcon: ({ color, size }) => (
           <Icon name={Users} size={size} color={color} />
         )}} />
-        <Tabs.Screen name="reels" options={{ tabBarLabel: 'Reels', headerTitle: '', headerTransparent: true, headerLeft: () => (
+        <Tabs.Screen name="reels/index" options={{ tabBarLabel: 'Reels', headerTitle: '', headerTransparent: true, headerLeft: () => (
           <TabsComponent defaultValue='tab1'>
             <TabsList style={{ backgroundColor: 'transparent' }}>
               <TabsTrigger value='tab1'>For You</TabsTrigger>
@@ -69,7 +70,7 @@ const TabLayout = () => {
         ), tabBarIcon: ({ color, size }) => (
           <Icon name={Video} size={size} color={color} />
         )}} />
-        <Tabs.Screen name="profile" options={{ tabBarLabel: 'Profile', headerTransparent: true, headerTitle: '', headerRight: () => (
+        <Tabs.Screen name="profile/index" options={{ tabBarLabel: 'Profile', headerTransparent: true, headerTitle: '', headerRight: () => (
           <>
             <TouchableOpacity style={{ padding: 10 }}>
               <Icon name={Pencil} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
@@ -77,11 +78,17 @@ const TabLayout = () => {
             <TouchableOpacity style={{ padding: 10 }}>
               <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
+            <TouchableOpacity style={{ padding: 10 }}>
+              <Icon name={LogOut} size={24} onPress={async () => {
+                removeToken()
+                router.replace('/')
+              }} color={colorScheme === 'dark' ? 'white' : 'black'} />
+            </TouchableOpacity>
           </>
         ), tabBarIcon: ({ color, size }) => (
           <Icon name={User} size={size} color={color} />
         )}} />
-        <Tabs.Screen name="notifications" options={{ tabBarLabel: 'Activity', headerTitle: '', headerTransparent: true, headerLeft: () => ( 
+        <Tabs.Screen name="notifications/index" options={{ tabBarLabel: 'Activity', headerTitle: '', headerTransparent: true, headerLeft: () => ( 
           <TouchableOpacity style={{ padding: 10 }}>
             <Text>Notifications</Text>
           </TouchableOpacity>
@@ -97,7 +104,7 @@ const TabLayout = () => {
         ), tabBarIcon: ({ color, size }) => (
           <Icon name={Bell} size={size} color={color} />
         )}} />
-        <Tabs.Screen name="menu" options={{ tabBarLabel: 'Menu', headerTitle: '', headerTransparent: true, headerLeft: () => (
+        <Tabs.Screen name="menu/index" options={{ tabBarLabel: 'Menu', headerTitle: '', headerTransparent: true, headerLeft: () => (
           <TouchableOpacity style={{ padding: 10 }}>
             <Text>Menu</Text>
           </TouchableOpacity>

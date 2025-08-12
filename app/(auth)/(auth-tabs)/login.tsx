@@ -28,7 +28,6 @@ interface LoginFields {
 }
 
 export default function Login() {
-  const { setToken } = useAuth();
   const colorScheme = useColorScheme();
   colorScheme1 = colorScheme;
   const router = useRouter();
@@ -80,7 +79,6 @@ export default function Login() {
       });
       console.log('Login response:', response);
       loginSuccessToast();
-      setToken(response.token);
     } catch (error: string | any) {
       console.error('Login error:', error);
       loginErrorToast(error)

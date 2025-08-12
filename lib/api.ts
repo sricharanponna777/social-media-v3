@@ -1,13 +1,16 @@
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { API_URL } from "../constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface LoginData {
+export type Visibility = 'public' | 'private' | 'friends';
+
+export interface LoginData {
   email: string;
   password: string;
 }
 
-interface RegisterData {
+export interface RegisterData {
   username: string;
   email: string;
   password: string;
@@ -17,9 +20,15 @@ interface RegisterData {
   mobileNumber: string;
 }
 
-interface VerifyOtpData {
+export interface VerifyOtpData {
   otp: string;
   email: string | null;
+}
+
+export interface CreatePostData {
+  caption: string;
+  media: string[];
+  visibility: Visibility;
 }
 
 class Api {
@@ -73,7 +82,8 @@ class Api {
 
 class ApiService {
   private api = new Api();
-
+  
+  // ---------------------------USER ROUTES---------------------------
   async registerUser(data: RegisterData) {
     return this.api.post(
       'api/users/register',
@@ -96,7 +106,8 @@ class ApiService {
 
       const token = response.token;
       if (token) {
-        await SecureStore.setItemAsync('auth_token', token);
+        await AsyncStorage.setItem('auth_token', token);
+        console.log('Token:', token);
       }
 
       return response;
@@ -104,10 +115,6 @@ class ApiService {
       console.error('Login failed:', error);
       throw error;
     }
-  }
-
-  async logoutUser() {
-    await SecureStore.deleteItemAsync('auth_token');
   }
 
   async verifyOtp(data: VerifyOtpData) {
@@ -119,9 +126,92 @@ class ApiService {
         undefined,
         { 'Content-Type': 'application/json' }
       );
+      await AsyncStorage.setItem('auth_token', response.token);
       return response;
     } catch (error) {
       console.error('OTP verification failed:', error);
+      throw error;
+    }
+  }
+
+  async validateToken(data: any) {  
+    try {
+      const token = await AsyncStorage.getItem('auth_token');
+      console.log('Token:', token);
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+      const response = await this.api.post(
+        'api/users/verify-token',
+        data,
+        token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ---------------------------UPLOAD ROUTES---------------------------
+  async uploadImage(data: FormData) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      const response = await this.api.post(
+        'api/uploads/image',
+        data,
+        auth_token,
+        undefined
+      );
+      console.log(response)
+      return response;
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      throw error;
+    }
+  }
+
+  async uploadVideo(data: FormData) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      const response = await this.api.post(
+        'api/uploads/video',
+        data,
+        auth_token,
+        undefined,
+        { 'Content-Type': 'multipart/form-data' }
+      );
+      return response;
+    } catch (error) {
+      console.error('Video upload failed:', error);
+      throw error;
+    }
+  }
+
+  // ---------------------------POST ROUTES---------------------------
+  async createPost(data: CreatePostData) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      const response = await this.api.post(
+        'api/posts',
+        data,
+        auth_token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+      return response;
+    } catch (error) {
+      console.error('Post creation failed:', error);
       throw error;
     }
   }
