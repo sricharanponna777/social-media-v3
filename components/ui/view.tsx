@@ -6,7 +6,8 @@ export const View = forwardRef<RNView, ViewProps>(
     return (
       <RNView
         ref={ref}
-        style={[{ backgroundColor: 'transparent' }, style]}
+        className='bg-transparent'
+        style={style}
         {...otherProps}
       />
     );

@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
 } from 'react-native';
 import { CountryCodeOptions } from '@/constants';
 
@@ -23,10 +22,10 @@ export const CountryCodePicker: React.FC<CountryCodePickerProps> = ({ value, onC
   return (
     <>
       <TouchableOpacity
-        style={styles.selector}
+        className="border border-gray-300 p-3 rounded-lg mb-3 bg-white"
         onPress={() => setIsVisible(true)}
       >
-        <Text style={styles.selectorText}>
+        <Text className="text-base text-gray-800">
           {value ? `+${value}` : selectedLabel}
         </Text>
       </TouchableOpacity>
@@ -37,15 +36,15 @@ export const CountryCodePicker: React.FC<CountryCodePickerProps> = ({ value, onC
         onRequestClose={() => setIsVisible(false)}
       >
         
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Choose Country Code</Text>
+        <View className="flex-1 pt-15 px-4 bg-white">
+          <Text className="text-xl mb-3 font-bold">Choose Country Code</Text>
 
           <FlatList
             data={CountryCodeOptions}
             keyExtractor={(item) => item.value.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.countryItem}
+                className="py-4 border-b border-gray-200"
                 onPress={() => {
                   onChange(parseInt(item.value));
                   setIsVisible(false);
@@ -60,34 +59,3 @@ export const CountryCodePicker: React.FC<CountryCodePickerProps> = ({ value, onC
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  selector: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-    backgroundColor: '#fff',
-  },
-  selectorText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  modalContainer: {
-    flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: 16,
-    backgroundColor: 'white',
-  },
-  modalTitle: {
-    fontSize: 20,
-    marginBottom: 12,
-    fontWeight: 'bold',
-  },
-  countryItem: {
-    paddingVertical: 16,
-    borderBottomColor: '#eee',
-    borderBottomWidth: 1,
-  },
-});

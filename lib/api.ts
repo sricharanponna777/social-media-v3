@@ -40,7 +40,7 @@ class Api {
   }
 
   async get(url: string, params?: any, token?: string, headers?: any) {
-    const response = await axios.get(`${API_URL}${url}`, {
+    const response = await axios.get(`${API_URL}/${url}`, {
       params,
       headers: this.buildHeaders(token, headers),
     });
@@ -48,7 +48,7 @@ class Api {
   }
 
   async post(url: string, data: any, token?: string, params?: any, headers?: any) {
-    const response = await axios.post(`${API_URL}${url}`, data, {
+    const response = await axios.post(`${API_URL}/${url}`, data, {
       params,
       headers: this.buildHeaders(token, headers),
     });
@@ -56,7 +56,7 @@ class Api {
   }
 
   async put(url: string, data: any, token?: string, params?: any, headers?: any) {
-    const response = await axios.put(`${API_URL}${url}`, data, {
+    const response = await axios.put(`${API_URL}/${url}`, data, {
       params,
       headers: this.buildHeaders(token, headers),
     });
@@ -64,7 +64,7 @@ class Api {
   }
 
   async patch(url: string, data: any, token?: string, params?: any, headers?: any) {
-    const response = await axios.patch(`${API_URL}${url}`, data, {
+    const response = await axios.patch(`${API_URL}/${url}`, data, {
       params,
       headers: this.buildHeaders(token, headers),
     });
@@ -212,6 +212,29 @@ class ApiService {
       return response;
     } catch (error) {
       console.error('Post creation failed:', error);
+      throw error;
+    }
+  }
+
+  async getFeed(page: number, limit: number) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token')
+      if (!auth_token) {
+        throw new Error("No auth token found")
+      }
+      const response = await this.api.get(
+        'api/posts/feed',
+        {
+          page,
+          limit,
+        },
+        auth_token,
+      )
+      response.page = page
+      response.limit = limit
+      return response
+    } catch (error) {
+      console.error('Feed retrieval failed:', error);
       throw error;
     }
   }

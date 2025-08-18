@@ -6,7 +6,6 @@ import React, { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Animated,
-  StyleSheet,
   View,
   ViewStyle,
 } from 'react-native';
@@ -201,7 +200,7 @@ export function Spinner({
           <ActivityIndicator
             size={config.size}
             color={spinnerColor}
-            style={styles.spinner}
+            className="self-center"
           />
         );
 
@@ -209,13 +208,13 @@ export function Spinner({
         return (
           <Animated.View
             style={[
-              styles.customSpinner,
               {
                 width: config.size,
                 height: config.size,
                 transform: [{ rotate: spin }],
               },
             ]}
+            className="items-center justify-center"
           >
             <Loader2 size={config.iconSize} color={spinnerColor} />
           </Animated.View>
@@ -225,7 +224,6 @@ export function Spinner({
         return (
           <Animated.View
             style={[
-              styles.pulseSpinner,
               {
                 width: config.size,
                 height: config.size,
@@ -233,17 +231,17 @@ export function Spinner({
                 transform: [{ scale: pulseAnim }],
               },
             ]}
+            className="rounded-full"
           />
         );
 
       case 'dots':
         return (
-          <View style={[styles.dotsContainer, { gap: config.size / 4 }]}>
+          <View style={{ gap: config.size / 4 }} className="flex-row items-center justify-center">
             {dotsAnim.map((anim, index) => (
               <Animated.View
                 key={index}
                 style={[
-                  styles.dot,
                   {
                     width: config.size / 3,
                     height: config.size / 3,
@@ -251,6 +249,7 @@ export function Spinner({
                     opacity: anim,
                   },
                 ]}
+                className="rounded-full"
               />
             ))}
           </View>
@@ -258,12 +257,11 @@ export function Spinner({
 
       case 'bars':
         return (
-          <View style={[styles.barsContainer, { gap: config.size / 6 }]}>
+          <View style={{ gap: config.size / 6 }} className="flex-row items-center justify-center">
             {barsAnim.map((anim, index) => (
               <Animated.View
                 key={index}
                 style={[
-                  styles.bar,
                   {
                     width: config.size / 6,
                     height: config.size,
@@ -271,6 +269,7 @@ export function Spinner({
                     opacity: anim,
                   },
                 ]}
+                className="rounded-lg"
               />
             ))}
           </View>
@@ -292,13 +291,11 @@ export function Spinner({
       {renderSpinner()}
       {(showLabel || label) && (
         <Text
-          style={[
-            styles.label,
-            {
+          style={{
               color: textColor,
               fontSize: config.fontSize,
-            },
-          ]}
+            }}
+          className="text-center font-medium"
         >
           {label || 'Loading...'}
         </Text>
@@ -339,15 +336,15 @@ export function LoadingOverlay({
   return (
     <Animated.View
       style={[
-        styles.overlay,
         {
           backgroundColor: backdrop ? defaultBackdropColor : 'transparent',
           opacity: overlayOpacity,
         },
       ]}
+      className="absolute inset-0 items-center justify-center z-[9999]"
       pointerEvents={visible ? 'auto' : 'none'}
     >
-      <View style={[styles.overlayContent, { backgroundColor: cardColor }]}>
+      <View style={{ backgroundColor: cardColor }} className="p-15 rounded-lg">
         <Spinner {...spinnerProps} />
       </View>
     </Animated.View>
@@ -365,7 +362,7 @@ export function InlineLoader({
       size={size}
       variant={variant}
       color={color}
-      style={styles.inlineLoader}
+      className="min-h-0 min-w-0"
     />
   );
 }
@@ -383,62 +380,7 @@ export function ButtonSpinner({
       size={size}
       variant={variant}
       color={color || primaryForegroundColor}
-      style={styles.buttonSpinner}
+      className="min-h-0 min-w-0"
     />
   );
 }
-
-const styles = StyleSheet.create({
-  spinner: {
-    alignSelf: 'center',
-  },
-  customSpinner: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pulseSpinner: {
-    borderRadius: 999,
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dot: {
-    borderRadius: 999,
-  },
-  barsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bar: {
-    borderRadius: CORNERS,
-  },
-  label: {
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 9999,
-  },
-  overlayContent: {
-    padding: 60,
-    borderRadius: BORDER_RADIUS,
-  },
-  inlineLoader: {
-    minHeight: 0,
-    minWidth: 0,
-  },
-  buttonSpinner: {
-    minHeight: 0,
-    minWidth: 0,
-  },
-});

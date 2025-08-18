@@ -13,7 +13,6 @@ import {
   Dimensions,
   Modal,
   Pressable,
-  StyleSheet,
   TouchableOpacity,
   View,
   ViewStyle,
@@ -314,10 +313,9 @@ export function PopoverContent({
       animationType='fade'
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.overlay} onPress={handleClose}>
+      <Pressable className="flex-1 bg-black/50" onPress={handleClose}>
         <View
           style={[
-            styles.content,
             {
               backgroundColor: popoverColor,
               borderColor: borderColor,
@@ -328,6 +326,7 @@ export function PopoverContent({
             },
             style,
           ]}
+          className="absolute rounded-lg border shadow-lg min-w-[200px]"
           onLayout={handleContentLayout}
           onStartShouldSetResponder={() => true}
         >
@@ -348,7 +347,7 @@ export function PopoverHeader({ children, style }: PopoverHeaderProps) {
   const borderColor = useThemeColor({}, 'border');
 
   return (
-    <View style={[styles.header, { borderBottomColor: borderColor }, style]}>
+    <View style={[{ borderBottomColor: borderColor }, style]} className="px-4 py-3 border-b">
       {children}
     </View>
   );
@@ -361,7 +360,7 @@ interface PopoverBodyProps {
 }
 
 export function PopoverBody({ children, style }: PopoverBodyProps) {
-  return <View style={[styles.body, style]}>{children}</View>;
+  return <View style={style} className="p-4">{children}</View>;
 }
 
 // Popover Footer
@@ -374,7 +373,7 @@ export function PopoverFooter({ children, style }: PopoverFooterProps) {
   const borderColor = useThemeColor({}, 'border');
 
   return (
-    <View style={[styles.footer, { borderTopColor: borderColor }, style]}>
+    <View style={[{ borderTopColor: borderColor }, style]} className="px-4 py-3 border-t flex-row justify-end gap-2">
       {children}
     </View>
   );
@@ -411,40 +410,3 @@ export function PopoverClose({
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  content: {
-    position: 'absolute',
-    borderRadius: BORDER_RADIUS,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 8,
-    minWidth: 200, // Ensure minimum width
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  body: {
-    padding: 16,
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 8,
-  },
-});

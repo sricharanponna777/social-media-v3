@@ -7,7 +7,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   Dimensions,
   Modal,
-  StyleSheet,
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
@@ -275,8 +274,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         presentationStyle='pageSheet'
         onRequestClose={handleCancel}
       >
-        <View style={[styles.modalContainer, { backgroundColor: card }]}>
-          <View style={styles.header}>
+        <View style={{ backgroundColor: card }} className="flex-1">
+          <View className="flex-row justify-between items-center px-5 py-4">
             <TouchableOpacity onPress={handleCancel}>
               <Text>Cancel</Text>
             </TouchableOpacity>
@@ -286,7 +285,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             </TouchableOpacity>
           </View>
 
-          <View style={styles.content}>
+          <View className="flex-1 p-5 items-center">
             {/* Color Preview */}
             <View
               style={{
@@ -308,15 +307,13 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             </View>
 
             {/* Saturation/Brightness Picker */}
-            <View style={styles.pickerContainer}>
+            <View className="mb-7.5 rounded-lg overflow-hidden">
               <GestureDetector gesture={pickerGesture}>
                 <View style={{ width: PICKER_SIZE, height: PICKER_SIZE }}>
                   {/* Base color layer */}
                   <View
-                    style={[
-                      styles.colorBase,
-                      { backgroundColor: pureHueColor },
-                    ]}
+                    style={{ backgroundColor: pureHueColor }}
+                    className={`absolute w-[${PICKER_SIZE}px] h-[${PICKER_SIZE}px] rounded-lg`}
                   />
 
                   {/* Saturation gradient (white to transparent, left to right) */}
@@ -324,7 +321,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                     colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0)']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={styles.gradientLayer}
+                    className={`absolute w-[${PICKER_SIZE}px] h-[${PICKER_SIZE}px] rounded-xl`}
                   />
 
                   {/* Brightness gradient (transparent to black, top to bottom) */}
@@ -332,16 +329,16 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                     colors={['rgba(0,0,0,0)', 'rgba(0,0,0,1)']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 0, y: 1 }}
-                    style={styles.gradientLayer}
+                    className={`absolute w-[${PICKER_SIZE}px] h-[${PICKER_SIZE}px] rounded-xl`}
                   />
 
-                  <Animated.View style={[styles.pickerKnob, pickerKnobStyle]} />
+                  <Animated.View style={pickerKnobStyle} className={`absolute w-[${KNOB_SIZE}px] h-[${KNOB_SIZE}px] rounded-lg bg-white border border-black shadow-lg`} />
                 </View>
               </GestureDetector>
             </View>
 
             {/* Hue Bar */}
-            <View style={styles.hueContainer}>
+            <View className="rounded-lg overflow-hidden">
               <GestureDetector gesture={hueGesture}>
                 <Animated.View>
                   <Svg width={PICKER_SIZE} height={HUE_BAR_HEIGHT}>
@@ -370,7 +367,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                     />
                   </Svg>
 
-                  <Animated.View style={[styles.hueKnob, hueKnobStyle]} />
+                  <Animated.View style={hueKnobStyle} className={`absolute w-[${KNOB_SIZE}px] h-[${KNOB_SIZE}px] rounded-lg bg-white opacity-50 border-2 border-black shadow-lg`} />
                 </Animated.View>
               </GestureDetector>
             </View>
@@ -380,71 +377,3 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    alignItems: 'center',
-  },
-  pickerContainer: {
-    marginBottom: 30,
-    borderRadius: BORDER_RADIUS,
-    overflow: 'hidden',
-  },
-  colorBase: {
-    position: 'absolute',
-    width: PICKER_SIZE,
-    height: PICKER_SIZE,
-    borderRadius: BORDER_RADIUS,
-  },
-  gradientLayer: {
-    position: 'absolute',
-    width: PICKER_SIZE,
-    height: PICKER_SIZE,
-    borderRadius: 12,
-  },
-  pickerKnob: {
-    position: 'absolute',
-    width: KNOB_SIZE,
-    height: KNOB_SIZE,
-    borderRadius: CORNERS,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#000',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  hueContainer: {
-    borderRadius: CORNERS,
-    overflow: 'hidden',
-  },
-  hueKnob: {
-    position: 'absolute',
-    width: KNOB_SIZE,
-    height: KNOB_SIZE,
-    borderRadius: CORNERS,
-    backgroundColor: 'white',
-    opacity: 0.5,
-    borderWidth: 2,
-    borderColor: '#000',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-});

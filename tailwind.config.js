@@ -3,7 +3,6 @@ const { join } = require("path");
 
 module.exports = {
   content: [
-    join(__dirname, "App.{js,jsx,ts,tsx}"),
     join(__dirname, "app/**/*.{js,jsx,ts,tsx}"),
     join(__dirname, "components/**/*.{js,jsx,ts,tsx}"),
   ],

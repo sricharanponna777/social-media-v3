@@ -19,6 +19,7 @@ interface ProgressProps {
   onSeekStart?: () => void;
   onSeekEnd?: () => void;
   interactive?: boolean;
+  className?: string;
 }
 
 export function Progress({
@@ -29,6 +30,7 @@ export function Progress({
   onSeekStart,
   onSeekEnd,
   interactive = false,
+  className = '',
 }: ProgressProps) {
   const primaryColor = useThemeColor({}, 'primary');
   const mutedColor = useThemeColor({}, 'muted');

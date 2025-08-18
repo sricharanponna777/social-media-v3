@@ -53,6 +53,7 @@ interface TabsProps {
 interface TabsListProps {
   children: React.ReactNode;
   style?: ViewStyle;
+  className?: string;
 }
 
 interface TabsTriggerProps {

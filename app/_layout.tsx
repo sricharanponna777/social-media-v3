@@ -1,4 +1,5 @@
 import { router, Stack } from 'expo-router';
+import '../global.css';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from '@/theme/theme-provider';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -40,7 +41,7 @@ function InnerLayout() {
 
   if (isLoading) {
     return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView className='flex-1'>
         {/* You can put a spinner here */}
       </GestureHandlerRootView>
     );
@@ -74,6 +75,7 @@ function InnerLayout() {
         paddingRight: insets.right,
         backgroundColor: colorScheme === 'dark' ? 'black' : 'white',
       }}
+      // className={`flex-1 pt-[${insets.top}] pl-[${insets.left}] pr-[${insets.right}] dark:bg-black bg-white`}
     >
       <ToastProvider>
         <SafeAreaProvider>

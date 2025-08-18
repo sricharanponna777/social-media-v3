@@ -16,7 +16,6 @@ import {
   Alert,
   Animated,
   Platform,
-  StyleSheet,
   View,
   ViewStyle,
 } from 'react-native';
@@ -289,7 +288,8 @@ export function AudioRecorder({
   if (!permissionGranted) {
     return (
       <View
-        style={[styles.container, { backgroundColor: secondaryColor }, style]}
+        style={[{ backgroundColor: secondaryColor }, style]}
+        className="rounded-lg p-5 items-center"
       >
         <Text variant='body' style={{ color: textColor, textAlign: 'center' }}>
           Microphone permission is required to record audio.
@@ -300,7 +300,8 @@ export function AudioRecorder({
 
   return (
     <View
-      style={[styles.container, { backgroundColor: secondaryColor }, style]}
+      style={[{ backgroundColor: secondaryColor }, style]}
+      className="rounded-lg p-5 items-center"
     >
       {recordingUri && !isRecording ? (
         <View style={{ alignItems: 'center' }}>
@@ -314,12 +315,12 @@ export function AudioRecorder({
               console.log('Playback status:', status);
             }}
           />
-          <View style={styles.playbackControls}>
+          <View className="flex-row items-center gap-4">
             <Button
               variant='outline'
               size='icon'
               onPress={handleDeleteRecording}
-              style={styles.controlButton}
+              className="w-12 h-12"
             >
               <Trash2 size={20} color={redColor} />
             </Button>
@@ -327,7 +328,8 @@ export function AudioRecorder({
             <Button
               variant='default'
               onPress={handleSaveRecording}
-              style={[styles.saveButton, { backgroundColor: greenColor }]}
+              style={{ backgroundColor: greenColor }}
+              className="flex-row items-center px-6"
             >
               <Download size={20} color='white' />
               <Text style={{ color: 'white', marginLeft: 8 }}>Save</Text>
@@ -338,8 +340,8 @@ export function AudioRecorder({
         <View>
           {/* Recording Status */}
           {isRecording ? (
-            <View style={styles.recordingStatus}>
-              <View style={styles.recordingIndicator}>
+            <View className="h-9">
+              <View className="flex-row items-center justify-center">
                 <Circle size={8} color={redColor} fill={redColor} />
                 <Text
                   variant='caption'
@@ -354,7 +356,7 @@ export function AudioRecorder({
           )}
           {/* Waveform Visualization */}
           {showWaveform && (
-            <View style={styles.waveformContainer}>
+            <View className="items-center mb-4">
               <AudioWaveform
                 data={waveformData}
                 isPlaying={false} // Disable built-in animation
@@ -371,7 +373,7 @@ export function AudioRecorder({
           )}
           {/* Timer */}
           {showTimer && (
-            <View style={styles.timerContainer}>
+            <View className="items-center mb-5">
               <Text
                 variant='title'
                 style={{
@@ -390,14 +392,15 @@ export function AudioRecorder({
           )}
 
           {/* Controls */}
-          <View style={styles.controlsContainer}>
+          <View className="items-center mb-3">
             {!isRecording && !recordingUri && (
               <Animated.View style={{ transform: [{ scale: recordingPulse }] }}>
                 <Button
                   variant='default'
                   size='lg'
                   onPress={handleStartRecording}
-                  style={[styles.recordButton, { backgroundColor: redColor }]}
+                  style={{ backgroundColor: redColor }}
+                  className="w-20 h-20 rounded-full"
                 >
                   <Mic size={32} color='white' />
                 </Button>
@@ -409,7 +412,8 @@ export function AudioRecorder({
                 variant='default'
                 size='lg'
                 onPress={handleStopRecording}
-                style={[styles.stopButton, { backgroundColor: redColor }]}
+                style={{ backgroundColor: redColor }}
+                className="w-20 h-20 rounded-full"
               >
                 <Square size={32} fill='white' color='white' />
               </Button>
@@ -420,55 +424,3 @@ export function AudioRecorder({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: BORDER_RADIUS,
-    padding: 20,
-    alignItems: 'center',
-  },
-  recordingStatus: {
-    height: 36,
-  },
-  recordingIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  waveformContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  timerContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  controlsContainer: {
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  recordButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  stopButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  playbackControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  controlButton: {
-    width: 48,
-    height: 48,
-  },
-  saveButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-});

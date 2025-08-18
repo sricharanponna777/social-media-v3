@@ -14,7 +14,6 @@ import {
   Modal,
   Pressable,
   View as RNView,
-  StyleSheet,
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
@@ -276,22 +275,21 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
     };
 
     const renderPreviewItem = ({ item }: { item: MediaAsset }) => (
-      <View style={[styles.previewItem, { borderColor }]}>
+      <View style={{ borderColor }} className="mx-1 rounded-lg border overflow-hidden relative">
         <ExpoImage
           source={{ uri: item.uri }}
-          style={[
-            styles.previewImage,
-            { width: previewSize, height: previewSize },
-          ]}
+          style={{ width: previewSize, height: previewSize }}
+          className="rounded-lg"
           contentFit='cover'
         />
         {item.type === 'video' && (
-          <View style={styles.videoIndicator}>
+          <View className="absolute top-2 left-2 bg-black/60 rounded-full p-1">
             <Video size={16} color='white' />
           </View>
         )}
         <TouchableOpacity
-          style={[styles.removeButton, { backgroundColor: primaryColor }]}
+          style={{ backgroundColor: primaryColor }}
+          className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full items-center justify-center"
           onPress={() => removeAsset(item.id)}
         >
           <X size={12} color={secondary} />
@@ -306,35 +304,32 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
       return (
         <Pressable
           style={[
-            styles.galleryItem,
             { width: itemWidth, height: itemWidth },
             isSelected && { borderColor: primaryColor, borderWidth: 3 },
           ]}
+          className="m-px rounded-md overflow-hidden relative"
           onPress={() => handleGalleryAssetSelect(item)}
         >
           <ExpoImage
             source={{ uri: item.uri }}
-            style={styles.galleryImage}
+            className="w-full h-full"
             contentFit='cover'
           />
           {item.mediaType === MediaLibrary.MediaType.video && (
-            <View style={styles.videoIndicator}>
+            <View className="absolute top-2 left-2 bg-black/60 rounded-full p-1">
               <Video size={20} color='white' />
             </View>
           )}
           {multiple && isSelected && (
             <View
-              style={[
-                styles.selectedIndicator,
-                { backgroundColor: primaryColor },
-              ]}
+              style={{ backgroundColor: primaryColor }}
+              className="absolute top-2 right-2 w-6 h-6 rounded-full items-center justify-center"
             >
               <Text
                 style={{
                   color: secondary,
-                  fontSize: 12,
-                  fontWeight: 'bold',
                 }}
+                className="text-xs font-bold"
               >
                 {assets.findIndex((asset) => asset.id === item.id) + 1}
               </Text>
@@ -374,8 +369,8 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.previewContainer}
-            contentContainerStyle={styles.previewContent}
+            className="mt-3"
+            contentContainerStyle={{paddingHorizontal: 4}}
           />
         )}
 
@@ -386,10 +381,12 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
             presentationStyle='pageSheet'
           >
             <View
-              style={[styles.modalContainer, { backgroundColor: cardColor }]}
+              style={{ backgroundColor: cardColor }}
+              className="flex-1"
             >
               <View
-                style={[styles.modalHeader, { borderBottomColor: borderColor }]}
+                style={{ borderBottomColor: borderColor }}
+                className="flex-row justify-between items-center p-4 border-b"
               >
                 <Text variant='title'>
                   {buttonText ||
@@ -401,10 +398,11 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
                         : 'Videos'
                     }`}
                 </Text>
-                <View style={styles.modalActions}>
+                <View className="flex-row items-center gap-4">
                   {multiple && (
                     <Text
-                      style={[styles.selectionCount, { color: mutedColor }]}
+                      style={{ color: mutedColor }}
+                      className="text-base font-medium"
                     >
                       {assets.length}/{maxSelection}
                     </Text>
@@ -425,7 +423,7 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
                 renderItem={renderGalleryItem}
                 keyExtractor={(item) => item.id}
                 numColumns={3}
-                contentContainerStyle={styles.galleryContent}
+                contentContainerStyle={{padding: 2}}
               />
             </View>
           </Modal>
@@ -434,115 +432,5 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
     );
   }
 );
-
-const styles = StyleSheet.create({
-  compactButton: {
-    width: 60,
-    height: 60,
-    borderRadius: CORNERS,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  disabled: {
-    opacity: 0.5,
-  },
-
-  previewContainer: {
-    marginTop: 12,
-  },
-
-  previewContent: {
-    paddingHorizontal: 4,
-  },
-
-  previewItem: {
-    marginHorizontal: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-
-  previewImage: {
-    borderRadius: 8,
-  },
-
-  videoIndicator: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 12,
-    padding: 4,
-  },
-
-  removeButton: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  modalContainer: {
-    flex: 1,
-  },
-
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-
-  modalActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-
-  selectionCount: {
-    fontSize: FONT_SIZE,
-    fontWeight: '500',
-  },
-
-  closeButton: {
-    padding: 4,
-  },
-
-  galleryContent: {
-    padding: 2,
-  },
-
-  galleryItem: {
-    margin: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-
-  galleryImage: {
-    width: '100%',
-    height: '100%',
-  },
-
-  selectedIndicator: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 MediaPicker.displayName = 'MediaPicker';

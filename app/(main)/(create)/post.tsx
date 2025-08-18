@@ -4,7 +4,6 @@ import {
   Image,
   Linking,
   Platform,
-  StyleSheet,
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 
@@ -137,6 +136,11 @@ export default function CreatePost() {
           setMediaUrls((prev) => [...prev, res.url])
           console.log(mediaUrls)
         }
+        if (mediaType === 'video') {
+          const res = await apiService.uploadVideo(formData)
+          setMediaUrls((prev) => [...prev, res.url])
+          console.log(mediaUrls)
+        }
         setMedia((prev) => [...prev, ...result.assets])
       }
     } catch (error) {
@@ -166,6 +170,11 @@ export default function CreatePost() {
           setMediaUrls((prev) => [...prev, res.url])
           console.log(mediaUrls)
         }
+        if (mediaType === 'video') {
+          const res = await apiService.uploadVideo(formData)
+          setMediaUrls((prev) => [...prev, res.url])
+          console.log(mediaUrls)
+        }
         setMedia((prev) => [...prev, ...result.assets])
       }
     } catch (error) {
@@ -179,25 +188,25 @@ export default function CreatePost() {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 px-6 py-12">
       {/* Title */}
-      <Text style={styles.title}>Create Post</Text>
+      <Text className="mb-6 text-2xl font-bold">Create Post</Text>
 
       {/* Media Picker */}
-      <View style={styles.section}>
-        <Button onPress={() => setIsVisible(true)} style={styles.button}>
+      <View className="mb-6">
+        <Button onPress={() => setIsVisible(true)} className="w-[333px] h-12">
           Add Media
         </Button>
 
         {/* Media Preview */}
         {media.length > 0 && (
           <>
-            <View style={styles.mediaPreview}>
+            <View className="flex-row flex-wrap gap-2.5 mt-3">
               {media.map((item, index) => (
                 <Image
                   key={index}
                   source={{ uri: item.uri }}
-                  style={styles.mediaImage}
+                  className="w-20 h-20 rounded-lg"
                 />
               ))}
             </View>
@@ -206,7 +215,7 @@ export default function CreatePost() {
             <Button
               onPress={handleClearMedia}
               variant="outline"
-              style={[styles.button, { marginTop: 12 }]}
+              className="w-[333px] h-12 mt-3"
             >
               Clear Media
             </Button>
@@ -238,7 +247,7 @@ export default function CreatePost() {
       </View>
 
       {/* Caption Input */}
-      <View style={styles.section}>
+      <View className="mb-6">
         <Input
           placeholder="Write a caption..."
           value={caption}
@@ -247,8 +256,8 @@ export default function CreatePost() {
       </View>
 
       {/* Visibility Tabs */}
-      <View style={[styles.section, { alignItems: 'center' }]}>
-        <Text style={styles.subTitle}>Visibility</Text>
+      <View className="items-center mb-6">
+        <Text className="mb-3 text-base font-bold">Visibility</Text>
         <Tabs defaultValue={tabsValue} onValueChange={setTabsValue}>
           <TabsList style={{ width: '100%' }}>
             <TabsTrigger value="public">Public</TabsTrigger>
@@ -259,11 +268,11 @@ export default function CreatePost() {
       </View>
 
       {/* Create Button */}
-      <View style={styles.footer}>
+      <View className="items-center mt-3">
         <Button
           onPress={handleCreatePost}
           disabled={createPostDisabled || loading}
-          style={styles.button}
+          className="w-[333px] h-12"
         >
           {loading ? 'Posting...' : 'Create Post'}
         </Button>
@@ -271,43 +280,3 @@ export default function CreatePost() {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 48,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 24,
-  },
-  subTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  footer: {
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  button: {
-    width: 333,
-    height: 48,
-  },
-  mediaPreview: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 12,
-  },
-  mediaImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-  },
-})

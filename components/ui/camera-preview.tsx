@@ -8,7 +8,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import * as MediaLibrary from 'expo-media-library';
 import { Download, Upload, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, Dimensions, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -16,13 +16,9 @@ const { width: screenWidth } = Dimensions.get('window');
 export function CameraPreview() {
   const [showCamera, setShowCamera] = useState(false);
   const [cameraHeight, setCameraHeight] = useState((screenWidth * 4) / 3);
-  const [capturedMedia, setCapturedMedia] = useState<{
-    uri: string;
-    type: 'picture' | 'video';
-  } | null>(null);
+  const [capturedMedia, setCapturedMedia] = useState<{ uri: string; type: 'picture' | 'video' } | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [mediaLibraryPermission, requestMediaLibraryPermission] =
-    MediaLibrary.usePermissions();
+  const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
 
   const backgroundColor = useThemeColor({}, 'background');
   const cardColor = useThemeColor({}, 'card');
@@ -66,10 +62,7 @@ export function CameraPreview() {
       if (mediaLibraryPermission?.status !== 'granted') {
         const permission = await requestMediaLibraryPermission();
         if (!permission.granted) {
-          Alert.alert(
-            'Permission Required',
-            'Please grant permission to save media to your picture library.'
-          );
+          Alert.alert('Permission Required', 'Please grant permission to save media to your picture library.');
           return;
         }
       }
@@ -77,21 +70,15 @@ export function CameraPreview() {
       // Save to media library
       await MediaLibrary.saveToLibraryAsync(capturedMedia.uri);
 
-      Alert.alert(
-        'Success!',
-        `${
-          capturedMedia.type === 'picture' ? 'Photo' : 'Video'
-        } saved to your picture library.`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setCapturedMedia(null);
-              setShowPreview(false);
-            },
+      Alert.alert('Success!', `${capturedMedia.type === 'picture' ? 'Photo' : 'Video'} saved to your picture library.`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            setCapturedMedia(null);
+            setShowPreview(false);
           },
-        ]
-      );
+        },
+      ]);
     } catch (error) {
       console.error('Error saving to album:', error);
       Alert.alert('Error', 'Failed to save media to your picture library.');
@@ -117,35 +104,29 @@ export function CameraPreview() {
     // uploadToServer(mediaDetails);
     // saveToDatabase(mediaDetails);
 
-    Alert.alert(
-      'Upload Action',
-      `${
-        capturedMedia.type === 'picture' ? 'Photo' : 'Video'
-      } ready for processing.\n\nCheck console for media details.`,
-      [
-        {
-          text: 'Continue',
-          onPress: () => {
-            // You might want to keep the preview open or close it
-            // depending on your use case
-          },
+    Alert.alert('Upload Action', `${capturedMedia.type === 'picture' ? 'Photo' : 'Video'} ready for processing.\n\nCheck console for media details.`, [
+      {
+        text: 'Continue',
+        onPress: () => {
+          // You might want to keep the preview open or close it
+          // depending on your use case
         },
-        {
-          text: 'Done',
-          onPress: () => {
-            // setCapturedMedia(null);
-            // setShowPreview(false);
-          },
+      },
+      {
+        text: 'Done',
+        onPress: () => {
+          // setCapturedMedia(null);
+          // setShowPreview(false);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   // Preview Mode
   if (showPreview && capturedMedia) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor }]}>
-        <View style={[styles.previewContainer, { height: cameraHeight }]}>
+      <SafeAreaView style={{ backgroundColor }} className="flex-1">
+        <View style={{ height: cameraHeight }} className="w-screen rounded-xl overflow-hidden relative mx-0">
           {capturedMedia.type === 'picture' && capturedMedia.uri ? (
             <Image source={{ uri: capturedMedia.uri }} />
           ) : (
@@ -158,39 +139,21 @@ export function CameraPreview() {
           )}
 
           {/* Top Floating Buttons */}
-          <View style={styles.topFloatingButtons}>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
+          <View className="absolute bottom-10 left-5 right-5 flex-row justify-between items-center">
+            <View className="flex-1 flex-row items-center justify-between">
               <TouchableOpacity
-                style={[
-                  styles.floatingButton,
-                  { backgroundColor: cardColor, opacity: 0.9 },
-                ]}
+                style={{ backgroundColor: cardColor, opacity: 0.9 }}
+                className="w-14 h-14 rounded-full justify-center items-center shadow-black shadow-offset-0 2 shadow-opacity-25 shadow-radius-4 elevation-5"
                 onPress={handleRetakeMedia}
                 activeOpacity={0.8}
               >
                 <X size={24} color={textColor} />
               </TouchableOpacity>
 
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 16,
-                }}
-              >
+              <View className="flex-row items-center justify-between gap-4">
                 <TouchableOpacity
-                  style={[
-                    styles.floatingButton,
-                    { backgroundColor: cardColor, opacity: 0.9 },
-                  ]}
+                  style={{ backgroundColor: cardColor, opacity: 0.9 }}
+                  className="w-14 h-14 rounded-full justify-center items-center shadow-black shadow-offset-0 2 shadow-opacity-25 shadow-radius-4 elevation-5"
                   onPress={handleSaveToAlbum}
                   activeOpacity={0.8}
                 >
@@ -198,10 +161,8 @@ export function CameraPreview() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[
-                    styles.floatingButton,
-                    { backgroundColor: cardColor, opacity: 0.9 },
-                  ]}
+                  style={{ backgroundColor: cardColor, opacity: 0.9 }}
+                  className="w-14 h-14 rounded-full justify-center items-center shadow-black shadow-offset-0 2 shadow-opacity-25 shadow-radius-4 elevation-5"
                   onPress={handleUploadAction}
                   activeOpacity={0.8}
                 >
@@ -233,24 +194,19 @@ export function CameraPreview() {
 
   // Main Screen
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor }]}>
-      <View style={styles.content}>
-        <Text variant='heading' style={styles.title}>
+    <SafeAreaView style={{ backgroundColor }} className="flex-1">
+      <View className="flex-1 p-5 justify-center items-center">
+        <Text variant='heading' className="mb-4 text-center">
           Camera Component
         </Text>
 
-        <Text variant='body' style={styles.description}>
+        <Text variant='body' className="text-center mb-8 px-5">
           Tap the button below to open the camera and capture photos or videos.
           After capturing, you can preview, save, or process your media.
         </Text>
 
-        <View style={styles.buttonContainer}>
-          <Button
-            variant='default'
-            size='lg'
-            onPress={handleOpenCamera}
-            style={styles.button}
-          >
+        <View className="w-full gap-4 items-center">
+          <Button variant='default' size='lg' onPress={handleOpenCamera} className="min-w-[200px]">
             Open Camera
           </Button>
         </View>

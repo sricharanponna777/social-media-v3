@@ -8,7 +8,7 @@ import {
   ImageSource,
 } from 'expo-image';
 import { forwardRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 export interface ImageProps extends Omit<ExpoImageProps, 'style'> {
   variant?: 'rounded' | 'circle' | 'default';
@@ -87,7 +87,6 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
     ].filter(Boolean) as ExpoImageProps['style'];
 
     const containerStyles = [
-      styles.container,
       containerDimensions,
       { borderRadius, backgroundColor },
       containerStyle,
@@ -108,7 +107,7 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
     };
 
     return (
-      <View style={containerStyles}>
+      <View style={containerStyles} className="relative overflow-hidden">
         <ExpoImage
           ref={ref}
           source={source}
@@ -123,7 +122,7 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
 
         {/* Loading indicator */}
         {isLoading && showLoadingIndicator && (
-          <View style={styles.overlay}>
+          <View className="absolute inset-0 justify-center items-center">
             <ActivityIndicator
               size={loadingIndicatorSize}
               color={loadingIndicatorColor || primaryColor}
@@ -133,10 +132,11 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
 
         {/* Error fallback */}
         {hasError && showErrorFallback && (
-          <View style={[styles.overlay, styles.errorContainer]}>
+          <View className="absolute inset-0 justify-center items-center p-2">
             <Text
               variant='caption'
-              style={[styles.errorText, { color: textColor }]}
+              style={{ color: textColor }}
+              className="text-center text-xs"
               numberOfLines={2}
             >
               {errorFallbackText}
@@ -147,28 +147,5 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
     );
   }
 );
-
-const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorContainer: {
-    padding: 8,
-  },
-  errorText: {
-    textAlign: 'center',
-    fontSize: 12,
-  },
-});
 
 Image.displayName = 'Image';

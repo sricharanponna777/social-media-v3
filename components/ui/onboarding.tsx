@@ -5,7 +5,6 @@ import React, { useRef, useState } from 'react';
 import {
   Dimensions,
   ScrollView,
-  StyleSheet,
   View,
   ViewStyle,
 } from 'react-native';
@@ -139,18 +138,18 @@ export function Onboarding({
     if (!showProgress) return null;
 
     return (
-      <View style={styles.progressContainer}>
+      <View className="flex-row justify-center items-center py-5">
         {steps.map((_, index) => (
           <View
             key={index}
             style={[
-              styles.progressDot,
               {
                 backgroundColor:
                   index === currentStep ? primaryColor : mutedColor,
                 opacity: index === currentStep ? 1 : 0.3,
               },
             ]}
+            className="w-2 h-2 rounded-full mx-1"
           />
         ))}
       </View>
@@ -164,39 +163,39 @@ export function Onboarding({
       <Animated.View
         key={step.id}
         style={[
-          styles.stepContainer,
           { backgroundColor: step.backgroundColor || backgroundColor },
           { opacity: isActive ? 1 : 0.8 },
         ]}
+        className="w-screen flex-1 justify-center items-center px-6"
       >
-        <View style={styles.contentContainer}>
+        <View className="flex-1 justify-center items-center max-w-md">
           {step.image && (
-            <View style={styles.imageContainer}>{step.image}</View>
+            <View className="flex-1 justify-center items-center mb-10 min-h-[200px]">{step.image}</View>
           )}
 
           {step.icon && !step.image && (
-            <View style={styles.imageContainer}>{step.icon}</View>
+            <View className="flex-1 justify-center items-center mb-10 min-h-[200px]">{step.icon}</View>
           )}
 
-          <View style={styles.textContainer}>
-            <Text variant='title' style={styles.title}>
+          <View className="items-center px-5 mb-10">
+            <Text variant='title' className="text-center mb-4 px-5">
               {step.title}
             </Text>
-            <Text variant='body' style={styles.description}>
+            <Text variant='body' className="text-center leading-6 px-5">
               {step.description}
             </Text>
           </View>
 
-          {children && <View style={styles.customContent}>{children}</View>}
+          {children && <View className="items-center px-5 mt-5">{children}</View>}
         </View>
       </Animated.View>
     );
   };
 
   return (
-    <View style={[styles.container, { backgroundColor }, style]}>
+    <View style={[{ backgroundColor }, style]} className="flex-1">
       <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.container, animatedStyle]}>
+        <Animated.View style={animatedStyle} className="flex-1">
           <ScrollView
             ref={scrollViewRef}
             horizontal
@@ -220,7 +219,7 @@ export function Onboarding({
 
       {/* Skip Button */}
       {showSkip && !isLastStep && (
-        <View style={styles.skipContainer}>
+        <View className="absolute top-15 right-2.5 z-10">
           <Button variant='ghost' onPress={handleSkip}>
             {skipButtonText}
           </Button>
@@ -228,7 +227,7 @@ export function Onboarding({
       )}
 
       {/* Navigation Buttons */}
-      <View style={styles.buttonContainer}>
+      <View className="w-full h-[90px] flex-row px-6 pb-10 gap-3">
         {!isFirstStep && (
           <Button variant='outline' onPress={handleBack} style={{ flex: 1 }}>
             {backButtonText}
@@ -238,7 +237,7 @@ export function Onboarding({
         <Button
           variant='default'
           onPress={handleNext}
-          style={[...(isFirstStep ? [styles.fullWidthButton] : [{ flex: 2 }])]}
+          style={[...(isFirstStep ? [{flex: 1}] : [{ flex: 2 }])]}
         >
           {isLastStep ? primaryButtonText : nextButtonText}
         </Button>
@@ -246,81 +245,6 @@ export function Onboarding({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  stepContainer: {
-    width: screenWidth,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    maxWidth: 400,
-  },
-  imageContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 40,
-    minHeight: 200,
-  },
-  textContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 40,
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 20,
-  },
-  description: {
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 20,
-  },
-  customContent: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop: 20,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
-  skipContainer: {
-    position: 'absolute',
-    top: 60,
-    right: 10,
-    zIndex: 1,
-  },
-  buttonContainer: {
-    width: '100%',
-    height: 90,
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-    gap: 12,
-  },
-  fullWidthButton: {
-    flex: 1,
-  },
-});
 
 // Onboarding Hook for managing state
 export function useOnboarding() {

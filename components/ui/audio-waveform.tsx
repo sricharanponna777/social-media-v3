@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from 'react';
 import {
   Animated,
   PanResponder,
-  StyleSheet,
   View,
   ViewStyle,
 } from 'react-native';
@@ -188,12 +187,14 @@ export function AudioWaveform({
 
   return (
     <View
-      style={[styles.container, { height }, style]}
+      style={[{ height }, style]}
+      className="justify-center items-center relative"
       onLayout={onLayout}
       ref={containerRef}
     >
       <View
-        style={[styles.waveform, { width: totalWidth }]}
+        style={{ width: totalWidth }}
+        className="flex-row items-center justify-center relative"
         {...(interactive ? panResponder.panHandlers : {})}
       >
         {animatedBars.map((animatedValue, index) => {
@@ -214,17 +215,14 @@ export function AudioWaveform({
           return (
             <View
               key={index}
-              style={[
-                styles.barContainer,
-                {
+              style={{
                   width: barWidth,
                   marginRight: index < barCount - 1 ? barGap : 0,
-                },
-              ]}
+                }}
+              className="justify-center items-center h-full"
             >
               <Animated.View
                 style={[
-                  styles.bar,
                   {
                     width: barWidth,
                     backgroundColor:
@@ -238,6 +236,7 @@ export function AudioWaveform({
                     }),
                   },
                 ]}
+                className="rounded-[1.5px] min-h-[4px]"
               />
             </View>
           );
@@ -246,14 +245,12 @@ export function AudioWaveform({
         {/* Progress indicator line */}
         {showProgress && (
           <View
-            style={[
-              styles.progressLine,
-              {
+            style={{
                 left: getProgressLinePosition(),
                 height: height * 0.95,
                 backgroundColor: finalActiveColor,
-              },
-            ]}
+              }}
+            className="absolute w-0.5 rounded-px opacity-90 top-[2.5%] z-10"
           />
         )}
       </View>
@@ -261,13 +258,11 @@ export function AudioWaveform({
       {/* Invisible overlay for better touch handling */}
       {interactive && (
         <View
-          style={[
-            styles.touchOverlay,
-            {
+          style={{
               width: totalWidth,
               height: height,
-            },
-          ]}
+            }}
+          className="absolute bg-transparent"
         />
       )}
     </View>
@@ -293,38 +288,3 @@ function generateSampleWaveform(barCount: number): number[] {
     );
   });
 }
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  waveform: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  barContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-  },
-  bar: {
-    borderRadius: 1.5,
-    minHeight: 4,
-  },
-  progressLine: {
-    position: 'absolute',
-    width: 2,
-    borderRadius: 1,
-    opacity: 0.9,
-    top: '2.5%',
-    zIndex: 10,
-  },
-  touchOverlay: {
-    position: 'absolute',
-    backgroundColor: 'transparent',
-  },
-});
