@@ -6,6 +6,7 @@ import apiService from '@/lib/api';
 import PostCard from '@/components/PostCard';
 import { useHeaderHeight } from "@react-navigation/elements";
 import Pagination from '@/components/pagination';
+import StoriesBar, { StoryItem } from '@/components/StoriesBar';
 
 interface Post {
   id: string;
@@ -17,12 +18,18 @@ interface Post {
   full_name: string;
 }
 
+interface Story extends StoryItem {
+  media_url: string;
+  media_type: string;
+}
+
 export default function FeedScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const limit = 20;
   const paddingTop = useHeaderHeight();
+  const [stories, setStories] = useState<Story[]>([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -38,13 +45,26 @@ export default function FeedScreen() {
     fetchPosts();
   }, [page]);
 
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const res: Story[] = await apiService.getFeedStories();
+        setStories(res);
+      } catch (error) {
+        console.error('Failed to fetch stories:', error);
+      }
+    };
+
+    fetchStories();
+  }, []);
+
   return (
     <View style={{ flex: 1, paddingTop }}>
-      
       <FlashList
         data={posts}
         renderItem={({ item }) => <PostCard post={item} />}
         keyExtractor={(item) => item.id}
+        ListHeaderComponent={<StoriesBar stories={stories} />}
       />
 
       {/* Pagination component */}

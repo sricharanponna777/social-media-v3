@@ -31,6 +31,20 @@ export interface CreatePostData {
   visibility: Visibility;
 }
 
+export interface CreateStoryData {
+  mediaUrl: string;
+  mediaType: 'image' | 'video';
+  caption?: string;
+  duration?: number;
+}
+
+export interface ViewStoryData {
+  viewDuration?: number;
+  completed?: boolean;
+  deviceInfo?: any;
+  locationData?: any;
+}
+
 class Api {
   private buildHeaders(token?: string, customHeaders?: any): any {
     return {
@@ -235,6 +249,72 @@ class ApiService {
       return response
     } catch (error) {
       console.error('Feed retrieval failed:', error);
+      throw error;
+    }
+  }
+
+  // ---------------------------STORY ROUTES---------------------------
+  async createStory(data: CreateStoryData) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      const response = await this.api.post(
+        'api/stories',
+        data,
+        auth_token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+      return response;
+    } catch (error) {
+      console.error('Story creation failed:', error);
+      throw error;
+    }
+  }
+
+  async getFeedStories() {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.get('api/stories/feed', undefined, auth_token);
+    } catch (error) {
+      console.error('Failed to fetch stories:', error);
+      throw error;
+    }
+  }
+
+  async getStory(id: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.get(`api/stories/${id}`, undefined, auth_token);
+    } catch (error) {
+      console.error('Failed to fetch story:', error);
+      throw error;
+    }
+  }
+
+  async viewStory(id: string, data: ViewStoryData) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.post(
+        `api/stories/${id}/view`,
+        data,
+        auth_token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+    } catch (error) {
+      console.error('Failed to record story view:', error);
       throw error;
     }
   }
