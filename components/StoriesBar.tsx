@@ -1,8 +1,5 @@
 import React from 'react'
-import { FlatList, TouchableOpacity } from 'react-native'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { Text } from '@/components/ui/text'
-import { View } from '@/components/ui/view'
+import { FlatList, TouchableOpacity, View, Text, Image } from 'react-native'
 import { useRouter } from 'expo-router'
 import { API_URL } from '@/constants'
 
@@ -24,12 +21,11 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories }) => {
       onPress={() => router.push(`/story/${item.id}`)}
       style={{ alignItems: 'center', marginRight: 12 }}
     >
-      <Avatar size={60} style={{ borderWidth: 2, borderColor: 'pink' }}>
-        <AvatarImage source={{ uri: `${API_URL}${item.avatar_url}` }} />
-      </Avatar>
-      <Text variant="caption" style={{ marginTop: 4 }}>
-        {item.username}
-      </Text>
+      <Image
+        source={{ uri: `${API_URL}${item.avatar_url}` }}
+        style={{ width: 60, height: 60, borderRadius: 30, borderWidth: 2, borderColor: 'pink' }}
+      />
+      <Text style={{ marginTop: 4, fontSize: 12 }}>{item.username}</Text>
     </TouchableOpacity>
   )
 
