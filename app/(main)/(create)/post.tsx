@@ -1,75 +1,70 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Alert,
-  Image,
-  Linking,
-  Platform,
-} from 'react-native'
+import { Alert, Image, Linking, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
-
-import { View } from '@/components/ui/view'
-import { Text } from '@/components/ui/text'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { ActionSheet } from '@/components/ui/action-sheet'
-import apiService, { Visibility } from '@/lib/api'
+import apiService from '@/lib/api'
 import { useRouter } from 'expo-router'
 
 export default function CreatePost() {
-  const router = useRouter();
-  const [tabsValue, setTabsValue] = useState('public')
+  const router = useRouter()
   const [caption, setCaption] = useState('')
-  const [loading, setLoading] = useState(false)
   const [media, setMedia] = useState<any[]>([])
-  const [isVisible, setIsVisible] = useState(false)
-  const [createPostDisabled, setCreatePostDisabled] = useState(false)
   const [mediaUrls, setMediaUrls] = useState<string[]>([])
 
   useEffect(() => {
     checkPermissions()
   }, [])
 
-  useEffect(() => {
-    if (mediaUrls.length > 5) {
-      setCreatePostDisabled(true)
-    }
-  }, [mediaUrls])
-
   const checkPermissions = async () => {
     if (Platform.OS !== 'web') {
-      try {
-        const { status: mediaStatus } = await ImagePicker.getMediaLibraryPermissionsAsync()
-        if (mediaStatus !== 'granted') {
-          const { status: newMediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-          if (newMediaStatus !== 'granted') {
-            Alert.alert(
-              'Permission Required',
-              'We need camera roll permissions to upload media. Please enable it in your settings.',
-              [
-                {
-                  text: 'Open Settings',
-                  onPress: async () => {
-                    if (Platform.OS === 'ios') {
-                      await Linking.openURL('app-settings:')
-                    } else {
-                      await Linking.openSettings()
-                    }
-                  },
-                },
-                { text: 'Cancel', style: 'cancel' },
-              ]
-            )
-          }
+      const { status: mediaStatus } = await ImagePicker.getMediaLibraryPermissionsAsync()
+      if (mediaStatus !== 'granted') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (status !== 'granted') {
+          Alert.alert('Permission Required', 'We need camera roll permissions to upload media.', [
+            {
+              text: 'Open Settings',
+              onPress: async () => {
+                if (Platform.OS === 'ios') {
+                  await Linking.openURL('app-settings:')
+                } else {
+                  await Linking.openSettings()
+                }
+              },
+            },
+            { text: 'Cancel', style: 'cancel' },
+          ])
         }
-
-        const { status: cameraStatus } = await ImagePicker.getCameraPermissionsAsync()
-        if (cameraStatus !== 'granted') {
-          await ImagePicker.requestCameraPermissionsAsync()
-        }
-      } catch (err) {
-        console.error('Permission check failed:', err)
       }
+
+      const { status: cameraStatus } = await ImagePicker.getCameraPermissionsAsync()
+      if (cameraStatus !== 'granted') {
+        await ImagePicker.requestCameraPermissionsAsync()
+      }
+    }
+  }
+
+  const handlePickMedia = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        quality: 1,
+      })
+      if (!result.canceled) {
+        const asset = result.assets[0]
+        const type = asset.type === 'image' ? 'image' : 'video'
+        const mimeType = type === 'image' ? 'image/jpeg' : 'video/mp4'
+        const formData = new FormData()
+        formData.append(type, {
+          uri: asset.uri,
+          name: type === 'image' ? 'content.jpg' : 'content.mp4',
+          type: mimeType,
+        } as any)
+        const res = type === 'image' ? await apiService.uploadImage(formData) : await apiService.uploadVideo(formData)
+        setMedia((prev) => [...prev, asset])
+        setMediaUrls((prev) => [...prev, res.url])
+      }
+    } catch (error) {
+      console.error('Media picking error:', error)
     }
   }
 
@@ -78,205 +73,47 @@ export default function CreatePost() {
       Alert.alert('Post Incomplete', 'Please add a caption before posting.')
       return
     }
-
-    console.log(`caption: ${caption}, mediaUrls: ${mediaUrls}, tabsValue: ${tabsValue}`)
-
     try {
       await apiService.createPost({
         caption,
         media: mediaUrls,
-        visibility: tabsValue as Visibility,
+        visibility: 'public',
       })
-      console.log('Post created successfully')
-      
-    } catch (error) {
-      console.error('Post creation failed:', error)
-      Alert.alert('Post Creation Failed', 'Please try again.')
-      return
-    }
-
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
       setCaption('')
       setMedia([])
       setMediaUrls([])
-      setTabsValue('public')
-      Alert.alert('Success', 'Post created successfully!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            router.push('/feed')
-          },
-        },
-      ])
-    }, 1500)
-  }
-
-  const handlePickMedia = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        aspect: [4, 3],
-        quality: 1,
-      })
-
-      if (!result.canceled) {
-        console.log(result.assets[0])
-        const mediaType = result.assets[0].type === 'image' ? 'image' : 'video'
-        const mimeType = mediaType === 'image' ? 'image/jpeg' : 'video/mp4'
-        const formData = new FormData()
-        formData.append(mediaType, {
-          uri: result.assets[0].uri,
-          name: mediaType === 'image' ? 'content.jpg' : 'content.mp4',
-          type: mimeType,
-        } as any)
-        if (mediaType === 'image') {
-          const res = await apiService.uploadImage(formData)
-          setMediaUrls((prev) => [...prev, res.url])
-          console.log(mediaUrls)
-        }
-        if (mediaType === 'video') {
-          const res = await apiService.uploadVideo(formData)
-          setMediaUrls((prev) => [...prev, res.url])
-          console.log(mediaUrls)
-        }
-        setMedia((prev) => [...prev, ...result.assets])
-      }
+      Alert.alert('Success', 'Post created successfully!', [{
+        text: 'OK',
+        onPress: () => router.push('/feed'),
+      }])
     } catch (error) {
-      console.error('Media picking error:', error)
+      console.error('Post creation failed:', error)
+      Alert.alert('Post Creation Failed', 'Please try again.')
     }
-  }
-
-  const handleTakeMedia = async () => {
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        quality: 1,
-      })
-
-      if (!result.canceled) {
-        console.log(result.assets[0])
-        const mediaType = result.assets[0].type === 'image' ? 'image' : 'video'
-        const mimeType = mediaType === 'image' ? 'image/jpeg' : 'video/mp4'
-        const formData = new FormData()
-        formData.append(mediaType, {
-          uri: result.assets[0].uri,
-          name: mediaType === 'image' ? 'content.jpg' : 'content.mp4',
-          type: mimeType,
-        } as any)
-        if (mediaType === 'image') {
-          const res = await apiService.uploadImage(formData)
-          setMediaUrls((prev) => [...prev, res.url])
-          console.log(mediaUrls)
-        }
-        if (mediaType === 'video') {
-          const res = await apiService.uploadVideo(formData)
-          setMediaUrls((prev) => [...prev, res.url])
-          console.log(mediaUrls)
-        }
-        setMedia((prev) => [...prev, ...result.assets])
-      }
-    } catch (error) {
-      console.error('Camera error:', error)
-    }
-  }
-
-  const handleClearMedia = () => {
-    setMedia([])
-    setMediaUrls([])
   }
 
   return (
     <View className="flex-1 px-6 py-12">
-      {/* Title */}
       <Text className="mb-6 text-2xl font-bold">Create Post</Text>
-
-      {/* Media Picker */}
-      <View className="mb-6">
-        <Button onPress={() => setIsVisible(true)} className="w-[333px] h-12">
-          Add Media
-        </Button>
-
-        {/* Media Preview */}
-        {media.length > 0 && (
-          <>
-            <View className="flex-row flex-wrap gap-2.5 mt-3">
-              {media.map((item, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: item.uri }}
-                  className="w-20 h-20 rounded-lg"
-                />
-              ))}
-            </View>
-
-            {/* Clear Media Button */}
-            <Button
-              onPress={handleClearMedia}
-              variant="outline"
-              className="w-[333px] h-12 mt-3"
-            >
-              Clear Media
-            </Button>
-          </>
-        )}
-
-        <ActionSheet
-          visible={isVisible}
-          onClose={() => setIsVisible(false)}
-          title="Choose an action"
-          message="Select one of the options below"
-          options={[
-            {
-              title: 'Select Photos/Videos',
-              onPress: () => {
-                handlePickMedia()
-                setIsVisible(false)
-              },
-            },
-            {
-              title: 'Take Photos/Videos',
-              onPress: () => {
-                handleTakeMedia()
-                setIsVisible(false)
-              },
-            },
-          ]}
-        />
-      </View>
-
-      {/* Caption Input */}
-      <View className="mb-6">
-        <Input
-          placeholder="Write a caption..."
-          value={caption}
-          onChangeText={setCaption}
-        />
-      </View>
-
-      {/* Visibility Tabs */}
-      <View className="items-center mb-6">
-        <Text className="mb-3 text-base font-bold">Visibility</Text>
-        <Tabs defaultValue={tabsValue} onValueChange={setTabsValue}>
-          <TabsList style={{ width: '100%' }}>
-            <TabsTrigger value="public">Public</TabsTrigger>
-            <TabsTrigger value="friends">Friends</TabsTrigger>
-            <TabsTrigger value="private">Private</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </View>
-
-      {/* Create Button */}
-      <View className="items-center mt-3">
-        <Button
-          onPress={handleCreatePost}
-          disabled={createPostDisabled || loading}
-          className="w-[333px] h-12"
-        >
-          {loading ? 'Posting...' : 'Create Post'}
-        </Button>
-      </View>
+      <TextInput
+        placeholder="Say something..."
+        value={caption}
+        onChangeText={setCaption}
+        className="mb-6 border p-2 rounded-lg"
+      />
+      {media.map((m, idx) => (
+        <Image key={idx} source={{ uri: m.uri }} style={{ width: '100%', height: 200, marginBottom: 8 }} />
+      ))}
+      <TouchableOpacity onPress={handlePickMedia} className="w-[333px] h-12 mb-4 bg-blue-500 rounded-lg items-center justify-center">
+        <Text className="text-white">Add Media</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={handleCreatePost}
+        className="w-[333px] h-12 bg-green-500 rounded-lg items-center justify-center"
+        disabled={!caption}
+      >
+        <Text className="text-white">Share Post</Text>
+      </TouchableOpacity>
     </View>
   )
 }
