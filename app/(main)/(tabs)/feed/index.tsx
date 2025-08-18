@@ -1,7 +1,7 @@
 import { View } from '@/components/ui/view'
 import { Text } from '@/components/ui/text'
 import React, { useEffect, useState } from 'react'
-import { FlatList } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import apiService from '@/lib/api';
 import PostCard from '@/components/PostCard';
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -41,7 +41,7 @@ export default function FeedScreen() {
   return (
     <View style={{ flex: 1, paddingTop }}>
       
-      <FlatList
+      <FlashList
         data={posts}
         renderItem={({ item }) => <PostCard post={item} />}
         keyExtractor={(item) => item.id}
