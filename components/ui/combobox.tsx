@@ -17,7 +17,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TextStyle,
@@ -171,7 +170,6 @@ export function ComboboxTrigger({
     <TouchableOpacity
       ref={triggerRef}
       style={[
-        styles.trigger,
         {
           backgroundColor: cardColor,
           borderColor: error ? destructiveColor : cardColor,
@@ -179,19 +177,20 @@ export function ComboboxTrigger({
         },
         style,
       ]}
+      className="h-12 flex-row items-center justify-between px-4 rounded-lg border"
       onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.7}
     >
-      <View style={styles.triggerContent}>{children}</View>
+      <View className="flex-1 flex-row items-center">{children}</View>
       <ChevronDown
         size={20}
         color={mutedColor}
         strokeWidth={2}
         style={[
-          styles.chevron,
           { transform: [{ rotate: isOpen ? '180deg' : '0deg' }] },
         ]}
+        className="ml-2"
       />
     </TouchableOpacity>
   );
@@ -223,12 +222,12 @@ export function ComboboxValue({
   return (
     <Text
       style={[
-        styles.valueText,
         {
           color: hasValue ? textColor : mutedColor,
         },
         style,
       ]}
+      className="text-base flex-1"
       numberOfLines={1}
     >
       {displayText}
@@ -267,10 +266,9 @@ export function ComboboxContent({
       animationType='fade'
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.overlay} onPress={handleClose}>
+      <Pressable className="flex-1 bg-black/30" onPress={handleClose}>
         <View
           style={[
-            styles.dropdown,
             {
               backgroundColor: cardColor,
               borderColor: borderColor,
@@ -280,6 +278,7 @@ export function ComboboxContent({
               maxHeight: dropdownHeight,
             },
           ]}
+          className="absolute rounded-lg border shadow-lg"
         >
           {children}
         </View>
@@ -308,13 +307,14 @@ export function ComboboxInput({
   return (
     <View
       style={[
-        styles.searchContainer,
         { borderBottomColor: borderColor },
         style,
       ]}
+      className="px-4 py-3 border-b h-12"
     >
       <TextInput
-        style={[styles.searchInput, { color: textColor }]}
+        style={{ color: textColor }}
+        className="text-base flex-1"
         placeholder={placeholder}
         placeholderTextColor={mutedColor}
         value={searchQuery}
@@ -388,7 +388,8 @@ export function ComboboxList({ children, style }: ComboboxListProps) {
 
   return (
     <ScrollView
-      style={[styles.optionsList, style]}
+      style={style}
+      className="max-h-[400px]"
       showsVerticalScrollIndicator={false}
     >
       {filteredChildren}
@@ -410,9 +411,9 @@ export function ComboboxEmpty({ children, style }: ComboboxEmptyProps) {
   if (!searchQuery || filteredItemsCount > 0) return null;
 
   return (
-    <View style={[styles.emptyContainer, style]}>
+    <View style={style} className="p-4 items-center">
       {typeof children === 'string' ? (
-        <Text style={[styles.emptyText, { color: mutedColor }]}>
+        <Text style={{ color: mutedColor }} className="text-base italic">
           {children}
         </Text>
       ) : (
@@ -451,7 +452,7 @@ export function ComboboxGroup({ children, heading }: ComboboxGroupProps) {
   return (
     <View>
       {heading && (
-        <Text style={[styles.groupHeading, { color: mutedColor }]}>
+        <Text style={{ color: mutedColor }} className="text-xs font-semibold px-4 py-2 uppercase tracking-wider">
           {heading}
         </Text>
       )}
@@ -506,26 +507,24 @@ export function ComboboxItem({
   return (
     <TouchableOpacity
       style={[
-        styles.option,
         {
           backgroundColor: isSelected ? `${primaryColor}15` : 'transparent',
           opacity: disabled ? 0.5 : 1,
         },
         style,
       ]}
+      className="flex-row items-center px-4 py-3 min-h-[44px]"
       onPress={handleSelect}
       disabled={disabled}
       activeOpacity={0.7}
     >
       {typeof children === 'string' ? (
         <Text
-          style={[
-            styles.optionText,
-            {
+          style={{
               color: textColor,
               fontWeight: isSelected ? '600' : '400',
-            },
-          ]}
+            }}
+          className="text-base flex-1"
         >
           {children}
         </Text>
@@ -541,84 +540,3 @@ export function ComboboxItem({
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  trigger: {
-    height: HEIGHT,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    borderRadius: CORNERS,
-    borderWidth: 1,
-  },
-  triggerContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  valueText: {
-    fontSize: FONT_SIZE,
-    flex: 1,
-  },
-  chevron: {
-    marginLeft: 8,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-  },
-  dropdown: {
-    position: 'absolute',
-    borderRadius: BORDER_RADIUS,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  searchContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    height: HEIGHT,
-  },
-  searchInput: {
-    fontSize: FONT_SIZE,
-    flex: 1,
-  },
-  optionsList: {
-    maxHeight: 400,
-  },
-  emptyContainer: {
-    padding: 16,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: FONT_SIZE,
-    fontStyle: 'italic',
-  },
-  groupHeading: {
-    fontSize: 12,
-    fontWeight: '600',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 44,
-  },
-  optionText: {
-    fontSize: FONT_SIZE,
-    flex: 1,
-  },
-});

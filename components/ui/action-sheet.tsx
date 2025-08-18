@@ -11,7 +11,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
@@ -177,42 +176,40 @@ function AndroidActionSheet({
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <View style={styles.container}>
+      <View className="flex-1 justify-end">
         <Animated.View
           style={[
-            styles.backdrop,
             {
               opacity: backgroundOpacity,
             },
           ]}
+          className="absolute inset-0 bg-black/50"
         >
           <Pressable
-            style={styles.backdropPressable}
+            className="flex-1"
             onPress={handleBackdropPress}
           />
         </Animated.View>
 
         <Animated.View
           style={[
-            styles.sheet,
             {
               backgroundColor: cardColor,
               transform: [{ translateY }],
             },
             style,
           ]}
+          className="rounded-t-lg pb-[34px] max-h-[80%] elevation-10 shadow-black shadow-offset-0 -2 shadow-opacity-25 shadow-radius-10"
         >
           {/* Header */}
           {(title || message) && (
-            <View style={styles.header}>
+            <View className="px-5 pt-5 pb-4 items-center">
               {title && (
                 <Text
-                  style={[
-                    styles.title,
-                    {
+                  style={{
                       color: textColor,
-                    },
-                  ]}
+                    }}
+                  className="text-lg font-semibold text-center mb-1"
                   numberOfLines={2}
                 >
                   {title}
@@ -220,12 +217,10 @@ function AndroidActionSheet({
               )}
               {message && (
                 <Text
-                  style={[
-                    styles.message,
-                    {
+                  style={{
                       color: mutedColor,
-                    },
-                  ]}
+                    }}
+                  className="text-sm text-center leading-5"
                   numberOfLines={3}
                 >
                   {message}
@@ -236,39 +231,37 @@ function AndroidActionSheet({
 
           {/* Options */}
           <ScrollView
-            style={styles.optionsContainer}
+            className="max-h-[300px]"
             showsVerticalScrollIndicator={false}
           >
             {options.map((option, index) => (
               <TouchableOpacity
                 key={index}
-                style={[
-                  styles.option,
-                  {
+                style={{
                     borderBottomColor: borderColor,
-                  },
-                  index === options.length - 1 && styles.lastOption,
-                  option.disabled && styles.disabledOption,
-                ]}
+                  }}
+                className={`border-b px-5 py-4 ${
+                  index === options.length - 1 && 'border-b-0'
+                } ${
+                  option.disabled && 'opacity-50'
+                }`}
                 onPress={() => handleOptionPress(option)}
                 disabled={option.disabled}
                 activeOpacity={0.6}
               >
-                <View style={styles.optionContent}>
+                <View className="flex-row items-center">
                   {option.icon && (
-                    <View style={styles.optionIcon}>{option.icon}</View>
+                    <View className="mr-3 w-6 h-6 items-center justify-center">{option.icon}</View>
                   )}
                   <Text
-                    style={[
-                      styles.optionText,
-                      {
+                    style={{
                         color: option.destructive
                           ? destructiveColor
                           : option.disabled
                           ? mutedColor
                           : textColor,
-                      },
-                    ]}
+                      }}
+                    className="text-base font-medium flex-1"
                     numberOfLines={1}
                   >
                     {option.title}
@@ -280,25 +273,21 @@ function AndroidActionSheet({
 
           {/* Cancel Button */}
           <View
-            style={[
-              styles.cancelContainer,
-              {
+            style={{
                 borderTopColor: borderColor,
-              },
-            ]}
+              }}
+            className="border-t mt-2"
           >
             <TouchableOpacity
-              style={styles.cancelButton}
+              className="px-5 py-4 items-center"
               onPress={onClose}
               activeOpacity={0.6}
             >
               <Text
-                style={[
-                  styles.cancelText,
-                  {
+                style={{
                     color: textColor,
-                  },
-                ]}
+                  }}
+                className="text-base font-semibold"
               >
                 {cancelButtonTitle}
               </Text>
@@ -309,94 +298,6 @@ function AndroidActionSheet({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  backdropPressable: {
-    flex: 1,
-  },
-  sheet: {
-    borderTopLeftRadius: CORNERS,
-    borderTopRightRadius: CORNERS,
-    paddingBottom: 34, // Safe area bottom padding
-    maxHeight: '80%',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  message: {
-    fontSize: FONT_SIZE - 1,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  optionsContainer: {
-    maxHeight: 300,
-  },
-  option: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  lastOption: {
-    borderBottomWidth: 0,
-  },
-  disabledOption: {
-    opacity: 0.5,
-  },
-  optionContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  optionIcon: {
-    marginRight: 12,
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionText: {
-    fontSize: FONT_SIZE,
-    fontWeight: '500',
-    flex: 1,
-  },
-  cancelContainer: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    marginTop: 8,
-  },
-  cancelButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: FONT_SIZE,
-    fontWeight: '600',
-  },
-});
 
 // Hook for easier ActionSheet usage
 export function useActionSheet() {

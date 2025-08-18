@@ -7,7 +7,7 @@ import { BORDER_RADIUS } from '@/theme/globals';
 import { AudioSource, useAudioPlayer } from 'expo-audio';
 import { Pause, Play, RotateCcw, Square } from 'lucide-react-native';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 
 export interface AudioPlayerProps {
   source: AudioSource;
@@ -158,11 +158,12 @@ export function AudioPlayer({
 
   return (
     <View
-      style={[styles.container, { backgroundColor: secondaryColor }, style]}
+      style={[{ backgroundColor: secondaryColor }, style]}
+      className="rounded-lg p-4 m-2"
     >
       {/* Waveform Visualization with seeking capability */}
       {showWaveform && (
-        <View style={styles.waveformContainer}>
+        <View className="items-center mb-3">
           <AudioWaveform
             data={waveformData}
             isPlaying={player.playing}
@@ -185,7 +186,7 @@ export function AudioPlayer({
 
       {/* Interactive Progress Bar */}
       {showProgressBar && (
-        <View style={styles.progressContainer}>
+        <View className="mb-3 px-1">
           <Progress
             value={progressPercentage}
             onValueChange={handleProgressSeek}
@@ -193,19 +194,18 @@ export function AudioPlayer({
             onSeekEnd={handleSeekEnd}
             interactive={true}
             height={6}
-            style={styles.progressBar}
           />
         </View>
       )}
 
       {/* Controls */}
       {showControls && (
-        <View style={styles.controlsContainer}>
+        <View className="flex-row items-center justify-center gap-3 mb-2">
           <Button
             variant='ghost'
             size='icon'
             onPress={handleBackFiveSeconds}
-            style={styles.controlButton}
+            className="w-10 h-10"
             disabled={!player.isLoaded}
           >
             <RotateCcw size={18} color={textColor} />
@@ -216,7 +216,7 @@ export function AudioPlayer({
             variant='destructive'
             onPress={handlePlayPause}
             disabled={!player.isLoaded}
-            style={styles.playButton}
+            className="w-14 h-14"
           >
             {player.playing ? (
               <Pause size={24} color='white' />
@@ -229,7 +229,7 @@ export function AudioPlayer({
             variant='ghost'
             size='icon'
             onPress={handleRestart}
-            style={styles.controlButton}
+            className="w-10 h-10"
             disabled={!player.isLoaded}
           >
             <Square fill={textColor} size={18} color={textColor} />
@@ -239,7 +239,7 @@ export function AudioPlayer({
 
       {/* Timer */}
       {showTimer && (
-        <View style={styles.timerContainer}>
+        <View className="items-center">
           <Text variant='caption' style={{ color: mutedColor }}>
             {formatTime(position)} / {formatTime(duration)}
           </Text>
@@ -248,7 +248,7 @@ export function AudioPlayer({
 
       {/* Loading State */}
       {!player.isLoaded && (
-        <View style={styles.loadingContainer}>
+        <View className="items-center p-2">
           <Text variant='caption' style={{ color: mutedColor }}>
             Loading audio...
           </Text>
@@ -257,44 +257,3 @@ export function AudioPlayer({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: BORDER_RADIUS,
-    padding: 16,
-    margin: 8,
-  },
-  waveformContainer: {
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  progressContainer: {
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  progressBar: {
-    // Additional styling if needed
-  },
-  controlsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    marginBottom: 8,
-  },
-  controlButton: {
-    width: 40,
-    height: 40,
-  },
-  playButton: {
-    width: 56,
-    height: 56,
-  },
-  timerContainer: {
-    alignItems: 'center',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    padding: 8,
-  },
-});

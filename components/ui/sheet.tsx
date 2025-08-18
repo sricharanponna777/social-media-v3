@@ -11,7 +11,6 @@ import {
   Modal,
   Platform,
   Pressable,
-  StyleSheet,
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
@@ -176,11 +175,10 @@ export function SheetContent({ children, style }: SheetContentProps) {
       onRequestClose={handleClose}
       statusBarTranslucent={true}
     >
-      <View style={styles.modalContainer}>
+      <View className="flex-1">
         {/* Semi-transparent overlay */}
         <Animated.View
           style={[
-            styles.overlay,
             {
               opacity: overlayOpacity.interpolate({
                 inputRange: [0, 1],
@@ -188,14 +186,14 @@ export function SheetContent({ children, style }: SheetContentProps) {
               }),
             },
           ]}
+          className="absolute inset-0 bg-black"
         >
-          <Pressable style={styles.overlayPressable} onPress={handleClose} />
+          <Pressable className="flex-1" onPress={handleClose} />
         </Animated.View>
 
         {/* Sheet */}
         <Animated.View
           style={[
-            styles.sheet,
             {
               borderRadius: BORDER_RADIUS,
               backgroundColor,
@@ -206,16 +204,15 @@ export function SheetContent({ children, style }: SheetContentProps) {
             },
             style,
           ]}
+          className="absolute top-0 bottom-0 border-l border-r shadow-lg"
         >
           {/* Close button */}
           <TouchableOpacity
-            style={[
-              styles.closeButton,
-              {
+            style={{
                 backgroundColor: backgroundColor,
                 [side === 'left' ? 'right' : 'left']: 16,
-              },
-            ]}
+              }}
+            className="absolute top-[50px] z-50 w-8 h-8"
             onPress={handleClose}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -223,7 +220,7 @@ export function SheetContent({ children, style }: SheetContentProps) {
           </TouchableOpacity>
 
           {/* Content */}
-          <View style={styles.contentContainer}>{children}</View>
+          <View className="flex-1">{children}</View>
         </Animated.View>
       </View>
     </Modal>
@@ -231,12 +228,12 @@ export function SheetContent({ children, style }: SheetContentProps) {
 }
 
 export function SheetHeader({ children, style }: SheetHeaderProps) {
-  return <View style={[styles.header, style]}>{children}</View>;
+  return <View style={style} className="pt-[90px] px-6 pb-4">{children}</View>;
 }
 
 export function SheetTitle({ children }: SheetTitleProps) {
   return (
-    <Text variant='title' style={styles.title}>
+    <Text variant='title' className="mb-2">
       {children}
     </Text>
   );
@@ -246,67 +243,6 @@ export function SheetDescription({ children }: SheetDescriptionProps) {
   const mutedColor = useThemeColor({}, 'textMuted');
 
   return (
-    <Text style={[styles.description, { color: mutedColor }]}>{children}</Text>
+    <Text style={{ color: mutedColor }} className="text-base leading-5">{children}</Text>
   );
 }
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 1)', // Will be controlled by opacity animation
-  },
-  overlayPressable: {
-    flex: 1,
-  },
-  sheet: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 10,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 10,
-      },
-    }),
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 50,
-    zIndex: 1000,
-    width: 32,
-    height: 32,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  header: {
-    paddingTop: 90,
-    paddingHorizontal: 24,
-    paddingBottom: 16,
-  },
-  title: {
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: FONT_SIZE,
-    lineHeight: 20,
-  },
-});

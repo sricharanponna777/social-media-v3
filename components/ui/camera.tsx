@@ -34,7 +34,6 @@ import {
   Alert,
   Animated,
   Dimensions,
-  StyleSheet,
   TouchableOpacity,
   View,
   ViewStyle,
@@ -434,9 +433,9 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
 
     if (!permission) {
       return (
-        <View style={[styles.container, { backgroundColor }, style]}>
+        <View style={[{ backgroundColor }, style]} className="flex-1 justify-center items-center">
           <ActivityIndicator size='large' color={primaryColor} />
-          <Text style={[styles.loadingText, { color: textColor }]}>
+          <Text style={{ color: textColor }} className="mt-4 text-base">
             Loading camera...
           </Text>
         </View>
@@ -445,20 +444,21 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
 
     return !permission.granted ? (
       <View
-        style={[styles.permissionContainer, { backgroundColor: cardColor }]}
+        style={{ backgroundColor: cardColor }}
+        className="gap-4 p-8 rounded-lg items-center"
       >
-        <CameraIcon size={36} color={textColor} style={styles.permissionIcon} />
+        <CameraIcon size={36} color={textColor} className="mb-4" />
 
-        <Text variant='title' style={{ textAlign: 'center' }}>
+        <Text variant='title' className="text-center">
           Camera Access Required
         </Text>
 
-        <Text variant='body' style={{ textAlign: 'center' }}>
+        <Text variant='body' className="text-center">
           We need access to your camera to take pictures and videos
         </Text>
 
-        <View style={{ width: '100%' }}>
-          <Button onPress={requestPermission} style={{ width: '100%' }}>
+        <View className="w-full">
+          <Button onPress={requestPermission} className="w-full">
             Grant Permission
           </Button>
         </View>
@@ -466,18 +466,18 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
     ) : (
       <Animated.View
         style={[
-          styles.container,
           { backgroundColor, opacity: fadeAnim },
           style,
         ]}
+        className="flex-1 justify-center items-center"
       >
-        <View style={[styles.cameraContainer, { height: getCameraHeight() }]}>
+        <View style={{ height: getCameraHeight() }} className="w-screen rounded-lg overflow-hidden">
           <GestureDetector gesture={composedGestures}>
-            <Animated.View style={styles.camera}>
+            <Animated.View className="flex-1">
               <CameraView
                 ref={cameraRef}
                 mode={mode}
-                style={styles.camera}
+                style={{flex: 1}}
                 facing={facing}
                 enableTorch={torch}
                 animateShutter={true}
@@ -487,52 +487,51 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
               >
                 {/* Grid Overlay */}
                 {showGrid && (
-                  <View style={styles.gridOverlay}>
-                    <View style={styles.gridLines}>
-                      <View style={[styles.gridLine, styles.verticalLine1]} />
-                      <View style={[styles.gridLine, styles.verticalLine2]} />
-                      <View style={[styles.gridLine, styles.horizontalLine1]} />
-                      <View style={[styles.gridLine, styles.horizontalLine2]} />
+                  <View className="absolute inset-0 z-10">
+                    <View className="flex-1 relative">
+                      <View className="absolute bg-white/30 left-1/3 top-0 bottom-0 w-px" />
+                      <View className="absolute bg-white/30 left-2/3 top-0 bottom-0 w-px" />
+                      <View className="absolute bg-white/30 top-1/3 left-0 right-0 h-px" />
+                      <View className="absolute bg-white/30 top-2/3 left-0 right-0 h-px" />
                     </View>
                   </View>
                 )}
 
                 {/* Zoom Indicator */}
                 <Animated.View
-                  style={[styles.zoomIndicator, { opacity: zoomTextAnim }]}
+                  style={{ opacity: zoomTextAnim }}
+                  className="absolute top-[45%] self-center bg-black/70 px-4 py-2 rounded-full z-20"
                   pointerEvents='none'
                 >
-                  <Text style={styles.zoomText}>{getZoomFactor()}</Text>
+                  <Text className="text-white text-base font-bold text-center">{getZoomFactor()}</Text>
                 </Animated.View>
 
                 {/* Zoom Controls */}
                 {zoomControls && (
                   <Animated.View
-                    style={[
-                      styles.zoomControls,
-                      {
+                    style={{
                         opacity: zoomControlsAnim,
                         backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                      },
-                    ]}
+                      }}
+                    className="absolute right-5 top-1/4 p-3 rounded-xl justify-center items-center z-50"
                     pointerEvents={zoomControls ? 'auto' : 'none'}
                   >
-                    <View style={styles.sliderContainer}>
-                      <Text style={[styles.zoomValue, { color: 'white' }]}>
+                    <View className="h-[200px] justify-between items-center py-2.5 -rotate-90">
+                      <Text style={{ color: 'white' }} className="text-sm font-bold">
                         1×
                       </Text>
                       <Progress
                         interactive
                         value={zoom * 100}
                         onValueChange={handleZoomSliderChange}
-                        style={styles.zoomSlider}
+                        style={{width: 160, borderRadius: 999}}
                         height={6}
                       />
-                      <Text style={[styles.zoomValue, { color: 'white' }]}>
+                      <Text style={{ color: 'white' }} className="text-sm font-bold">
                         5×
                       </Text>
                     </View>
-                    <Text style={[styles.currentZoomText, { color: 'white' }]}>
+                    <Text style={{ color: 'white' }} className="mt-3 text-xs font-semibold">
                       {getZoomFactor()}
                     </Text>
                   </Animated.View>
@@ -541,23 +540,23 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                 {/* Timer Overlay */}
                 {isTimerActive && (
                   <TouchableOpacity
-                    style={styles.timerOverlay}
+                    className="absolute inset-0 bg-black/50 justify-center items-center z-30"
                     onPress={cancelTimer}
                     activeOpacity={1}
                   >
-                    <Text style={styles.timerText}>{timerSeconds}</Text>
-                    <View style={styles.cancelTimerButton}>
+                    <Text className="text-7xl font-bold text-white text-center">{timerSeconds}</Text>
+                    <View className="absolute top-[60px] right-5 w-12 h-12 rounded-full bg-black/70 justify-center items-center">
                       <X size={20} color='white' />
                     </View>
-                    <Text style={styles.tapToCancelText}>Tap to cancel</Text>
+                    <Text className="absolute bottom-[100px] text-white text-base text-center">Tap to cancel</Text>
                   </TouchableOpacity>
                 )}
 
                 {/* Recording Indicator */}
                 {isRecording && (
-                  <View style={styles.recordingIndicator}>
-                    <View style={styles.recordingDot} />
-                    <Text style={styles.recordingText}>
+                  <View className="absolute top-5 left-5 flex-row items-center bg-red-500/80 px-3 py-1.5 rounded-full z-20">
+                    <View className="w-2 h-2 rounded-full bg-white mr-2" />
+                    <Text className="text-white text-sm font-bold">
                       REC {formatTime(recordingTime)}
                     </Text>
                   </View>
@@ -566,14 +565,12 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                 {showControls && (
                   <>
                     {/* Top Controls */}
-                    <View style={styles.topControls}>
-                      <View style={styles.topLeft}>
+                    <View className="absolute top-5 left-5 right-5 flex-row justify-between items-center z-10">
+                      <View className="flex-1 items-start">
                         {onClose && (
                           <TouchableOpacity
-                            style={[
-                              styles.controlButton,
-                              { backgroundColor: cardColor },
-                            ]}
+                            style={{ backgroundColor: cardColor }}
+                            className="w-12 h-12 rounded-full justify-center items-center bg-black/50"
                             onPress={onClose}
                             activeOpacity={0.7}
                           >
@@ -582,18 +579,16 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                         )}
                       </View>
 
-                      <View style={styles.topCenter}>
-                        <Text style={[styles.modeText, { color: textColor }]}>
+                      <View className="flex-1 items-center">
+                        <Text style={{ color: textColor }} className="text-base font-bold text-shadow-lg">
                           {mode.toUpperCase()}
                         </Text>
                       </View>
 
-                      <View style={styles.topRight}>
+                      <View className="flex-1 items-end">
                         <TouchableOpacity
-                          style={[
-                            styles.controlButton,
-                            { backgroundColor: cardColor },
-                          ]}
+                          style={{ backgroundColor: cardColor }}
+                          className="w-12 h-12 rounded-full justify-center items-center bg-black/50"
                           onPress={toggleSettings}
                           activeOpacity={0.7}
                         >
@@ -605,7 +600,6 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                     {/* Settings Panel */}
                     <Animated.View
                       style={[
-                        styles.settingsPanel,
                         {
                           backgroundColor: cardColor,
                           opacity: settingsAnim,
@@ -619,14 +613,13 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                           ],
                         },
                       ]}
+                      className="absolute top-[76px] left-5 right-5 rounded-lg p-4 z-20"
                       pointerEvents={showSettings ? 'auto' : 'none'}
                     >
-                      <View style={styles.settingsRow}>
+                      <View className="flex-row justify-around items-center">
                         <TouchableOpacity
-                          style={[
-                            styles.settingButton,
-                            showGrid && { backgroundColor: primaryColor },
-                          ]}
+                          style={showGrid && { backgroundColor: primaryColor }}
+                          className="w-12 h-12 rounded-full justify-center items-center"
                           onPress={() => setShowGrid(!showGrid)}
                         >
                           <Grid3X3
@@ -636,14 +629,12 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={[
-                            styles.settingButton,
-                            {
+                          style={{
                               backgroundColor: soundEnabled
                                 ? primaryColor
                                 : cardColor,
-                            },
-                          ]}
+                            }}
+                          className="w-12 h-12 rounded-full justify-center items-center"
                           onPress={() => setSoundEnabled(!soundEnabled)}
                         >
                           {soundEnabled ? (
@@ -654,29 +645,26 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={[
-                            styles.settingButton,
-                            { backgroundColor: cardColor },
-                          ]}
+                          style={{ backgroundColor: cardColor }}
+                          className="w-12 h-12 rounded-full justify-center items-center"
                           onPress={() =>
                             setAspectRatioIndex((prev) => (prev + 1) % 3)
                           }
                         >
                           <Text
-                            style={[styles.settingText, { color: textColor }]}
+                            style={{ color: textColor }}
+                            className="text-xs font-bold"
                           >
                             {aspectRatios[aspectRatioIndex]}
                           </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={[
-                            styles.settingButton,
-                            {
+                          style={{
                               backgroundColor:
                                 selectedTimer > 0 ? primaryColor : cardColor,
-                            },
-                          ]}
+                            }}
+                          className="w-12 h-12 rounded-full justify-center items-center"
                           onPress={() => {
                             const currentIndex =
                               timerOptions.indexOf(selectedTimer);
@@ -690,13 +678,11 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                             color={selectedTimer > 0 ? cardColor : textColor}
                           />
                           <Text
-                            style={[
-                              styles.timerSettingText,
-                              {
+                            style={{
                                 color:
                                   selectedTimer > 0 ? cardColor : textColor,
-                              },
-                            ]}
+                              }}
+                            className="text-[10px] font-bold mt-0.5"
                           >
                             {getTimerButtonText()}
                           </Text>
@@ -705,15 +691,13 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                     </Animated.View>
 
                     {/* Side Controls */}
-                    <View style={styles.sideControls}>
+                    <View className="absolute right-5 top-1/2 -translate-y-[120px] gap-4 z-10">
                       {enableTorch && facing === 'back' && (
                         <TouchableOpacity
-                          style={[
-                            styles.controlButton,
-                            {
+                          style={{
                               backgroundColor: torch ? primaryColor : cardColor,
-                            },
-                          ]}
+                            }}
+                          className="w-12 h-12 rounded-full justify-center items-center bg-black/50"
                           onPress={toggleTorch}
                           activeOpacity={0.7}
                         >
@@ -726,10 +710,8 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                       )}
 
                       <TouchableOpacity
-                        style={[
-                          styles.controlButton,
-                          { backgroundColor: cardColor },
-                        ]}
+                        style={{ backgroundColor: cardColor }}
+                        className="w-12 h-12 rounded-full justify-center items-center bg-black/50"
                         onPress={toggleCameraFacing}
                         activeOpacity={0.7}
                       >
@@ -738,14 +720,12 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
 
                       {/* New Zoom Control Button */}
                       <TouchableOpacity
-                        style={[
-                          styles.controlButton,
-                          {
+                        style={{
                             backgroundColor: zoomControls
                               ? primaryColor
                               : cardColor,
-                          },
-                        ]}
+                          }}
+                        className="w-12 h-12 rounded-full justify-center items-center bg-black/50"
                         onPress={handleZoomButtonTap}
                         activeOpacity={0.7}
                       >
@@ -762,10 +742,8 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                       {/* Mode Toggle Button */}
                       {enableVideo && (
                         <TouchableOpacity
-                          style={[
-                            styles.controlButton,
-                            { backgroundColor: cardColor },
-                          ]}
+                          style={{ backgroundColor: cardColor }}
+                          className="w-12 h-12 rounded-full justify-center items-center bg-black/50"
                           onPress={toggleMode}
                           disabled={isRecording || isCapturing}
                           activeOpacity={0.7}
@@ -780,11 +758,10 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                     </View>
 
                     {/* Bottom Controls */}
-                    <View style={styles.bottomControls}>
+                    <View className="absolute bottom-10 left-5 right-5 flex-row justify-center items-center z-10">
                       {/* Main Capture Button */}
                       <TouchableOpacity
                         style={[
-                          styles.captureButton,
                           {
                             backgroundColor:
                               mode === 'video' && isRecording
@@ -796,8 +773,9 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                                 : primaryColor,
                           },
                           (isCapturing || isTimerActive) &&
-                            styles.capturingButton,
+                            {transform: [{ scale: 0.9 }]},
                         ]}
+                        className="w-20 h-20 rounded-full border-4 justify-center items-center bg-white"
                         onPress={
                           mode === 'picture'
                             ? handleCapture
@@ -815,17 +793,15 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
                           />
                         ) : (
                           <View
-                            style={[
-                              styles.captureInner,
-                              {
+                            style={{
                                 backgroundColor:
                                   mode === 'video' && isRecording
                                     ? 'white'
                                     : primaryColor,
                                 borderRadius:
                                   mode === 'video' && isRecording ? 4 : 30,
-                              },
-                            ]}
+                              }}
+                            className="w-8 h-8"
                           />
                         )}
                       </TouchableOpacity>
@@ -842,290 +818,5 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
 );
 
 Camera.displayName = 'Camera';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cameraContainer: {
-    width: screenWidth,
-    borderRadius: BORDER_RADIUS,
-    overflow: 'hidden',
-  },
-  camera: {
-    flex: 1,
-  },
-  topControls: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  topLeft: {
-    flex: 1,
-    alignItems: 'flex-start',
-  },
-  topCenter: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  topRight: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  modeText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  settingsPanel: {
-    position: 'absolute',
-    top: 76,
-    left: 20,
-    right: 20,
-    borderRadius: BORDER_RADIUS,
-    padding: 16,
-    zIndex: 2,
-  },
-  settingsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  settingButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  settingText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  timerSettingText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    marginTop: 2,
-  },
-  sideControls: {
-    position: 'absolute',
-    right: 20,
-    top: '50%',
-    transform: [{ translateY: -120 }],
-    gap: 16,
-    zIndex: 1,
-  },
-  bottomControls: {
-    position: 'absolute',
-    bottom: 40,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  controlButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  captureButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-  },
-  captureInner: {
-    width: 32,
-    height: 32,
-    borderRadius: 30,
-  },
-  capturingButton: {
-    transform: [{ scale: 0.9 }],
-  },
-  gridOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1,
-  },
-  gridLines: {
-    flex: 1,
-    position: 'relative',
-  },
-  gridLine: {
-    position: 'absolute',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  verticalLine1: {
-    left: '33.33%',
-    top: 0,
-    bottom: 0,
-    width: 1,
-  },
-  verticalLine2: {
-    left: '66.66%',
-    top: 0,
-    bottom: 0,
-    width: 1,
-  },
-  horizontalLine1: {
-    top: '33.33%',
-    left: 0,
-    right: 0,
-    height: 1,
-  },
-  horizontalLine2: {
-    top: '66.66%',
-    left: 0,
-    right: 0,
-    height: 1,
-  },
-  zoomIndicator: {
-    position: 'absolute',
-    top: '45%',
-    alignSelf: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    zIndex: 2,
-  },
-  zoomText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  timerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 3,
-  },
-  timerText: {
-    fontSize: 72,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-  },
-  cancelTimerButton: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tapToCancelText: {
-    position: 'absolute',
-    bottom: 100,
-    color: 'white',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  recordingIndicator: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 0, 0, 0.8)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    zIndex: 2,
-  },
-  recordingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'white',
-    marginRight: 8,
-  },
-  recordingText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  permissionContainer: {
-    gap: 16,
-    padding: 32,
-    borderRadius: BORDER_RADIUS,
-    alignItems: 'center',
-  },
-  permissionIcon: {
-    marginBottom: 16,
-  },
-  permissionTitle: {
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  permissionText: {
-    textAlign: 'center',
-    marginBottom: 24,
-    fontSize: FONT_SIZE,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: FONT_SIZE,
-  },
-  zoomControls: {
-    position: 'absolute',
-    right: 20,
-    top: '25%',
-    padding: 12,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  sliderContainer: {
-    height: 200,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    transform: [{ rotate: '-90deg' }], // rotate to make it vertical
-  },
-  zoomSlider: {
-    width: 160, // becomes height visually due to rotate
-    borderRadius: 999,
-  },
-  zoomValue: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  currentZoomText: {
-    marginTop: 12,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-});
 
 export default Camera;

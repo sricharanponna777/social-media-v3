@@ -11,7 +11,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   View,
 } from 'react-native';
 import {
@@ -354,30 +353,29 @@ const FullscreenImage = memo(
     return (
       <View
         style={{
-          width: screenWidth,
-          height: screenHeight,
-          justifyContent: 'center',
-          alignItems: 'center',
           backgroundColor,
         }}
+        className="w-screen h-screen justify-center items-center"
       >
         {/* GestureDetector always present if zoom is enabled */}
         {enableZoom ? (
           <GestureDetector gesture={composedGesture}>
-            <Animated.View style={styles.imageContainer}>
+            <Animated.View className="flex-1 w-screen h-screen justify-center items-center">
               <AnimatedImage
                 source={{ uri: item.uri }}
-                style={[styles.fullscreenImage, animatedImageStyle]}
+                style={animatedImageStyle}
+                className="w-screen h-screen"
                 contentFit='contain'
               />
             </Animated.View>
           </GestureDetector>
         ) : (
           // If zoom is not enabled, render without GestureDetector
-          <Animated.View style={styles.imageContainer}>
+          <Animated.View className="flex-1 w-screen h-screen justify-center items-center">
             <AnimatedImage
               source={{ uri: item.uri }}
-              style={[styles.fullscreenImage, animatedImageStyle]}
+              style={animatedImageStyle}
+              className="w-screen h-screen"
               contentFit='contain'
             />
           </Animated.View>
@@ -551,7 +549,8 @@ export function Gallery({
       >
         <Image
           source={{ uri: item.thumbnail || item.uri }} // Use thumbnail if available, otherwise full URI
-          style={[styles.gridImage, { borderRadius }]}
+          style={{ borderRadius }}
+          className="flex-1"
           contentFit='cover'
           transition={200}
         />
@@ -561,7 +560,7 @@ export function Gallery({
 
         {/* Display title and description if enabled */}
         {(showTitles || showDescriptions) && (
-          <View style={[styles.itemInfo]}>
+          <View className="p-2">
             {showTitles && item.title && (
               <Text
                 variant='subtitle'
@@ -617,10 +616,10 @@ export function Gallery({
     const currentItem = getCurrentItem();
 
     return (
-      <View style={styles.fullscreenControls} pointerEvents='box-none'>
+      <View className="absolute inset-0" pointerEvents='box-none'>
         {/* Top controls (share, download, close) */}
-        <View style={[styles.topControls, { backgroundColor }]}>
-          <View style={styles.topRightControls}>
+        <View style={{ backgroundColor }} className="absolute top-0 left-0 right-0 flex-row justify-between items-center pt-14 px-4 pb-4">
+          <View className="gap-2 flex-row">
             {enableDownload && onDownload && (
               <Button size='icon' variant='ghost' onPress={handleDownload}>
                 <Download size={24} color={primary} />
@@ -639,7 +638,7 @@ export function Gallery({
         </View>
 
         {/* Bottom controls (page, title, description, thumbnails) */}
-        <View style={[styles.bottomControls, { backgroundColor }]}>
+        <View style={{ backgroundColor }} className="absolute bottom-0 left-0 right-0 p-4 pb-11.5">
           {showPages && (
             <Text
               variant='caption'
@@ -684,17 +683,17 @@ export function Gallery({
             renderItem={({ item, index }) => (
               <Pressable
                 style={[
-                  styles.thumbnailItem,
                   selectedIndex === index && {
                     borderColor: secondary, // Highlight selected thumbnail
                     borderWidth: 2,
                   },
                 ]}
+                className="w-10 h-10 rounded-lg border overflow-hidden border-transparent"
                 onPress={() => handleThumbnailPress(index)}
               >
                 <Image
                   source={{ uri: item.thumbnail || item.uri }}
-                  style={styles.thumbnailImage}
+                  className="w-full h-full"
                   contentFit='cover'
                 />
               </Pressable>
@@ -702,7 +701,7 @@ export function Gallery({
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.thumbnailContainer}
+            contentContainerStyle={{paddingHorizontal: 16, alignItems: 'center'}}
             ItemSeparatorComponent={() => <View style={{ width: 8 }} />} // Spacing between thumbnails
             getItemLayout={(data, index) => ({
               length: 48, // Fixed item length for layout calculation
@@ -718,7 +717,7 @@ export function Gallery({
   // Render empty state if no items are provided
   if (items.length === 0) {
     return (
-      <View style={[styles.emptyState]}>
+      <View className="flex-1 justify-center items-center p-8 rounded-lg m-4">
         <Text variant='subtitle' style={{ color: mutedColor }}>
           No images to display
         </Text>
@@ -731,8 +730,9 @@ export function Gallery({
     <GestureHandlerRootView style={{ flex: 1 }}>
       {/* ScrollView for the main gallery grid */}
       <ScrollView
-        style={[styles.container, { backgroundColor }]}
-        contentContainerStyle={[styles.grid, { gap: spacing }]}
+        style={{ backgroundColor }}
+        className="flex-1"
+        contentContainerStyle={{ gap: spacing, flexDirection: 'row', flexWrap: 'wrap'}}
         showsVerticalScrollIndicator={false}
         // Measure the container width on layout to calculate item widths dynamically
         onLayout={(event) => {
@@ -784,88 +784,3 @@ export function Gallery({
     </GestureHandlerRootView>
   );
 }
-
-// Stylesheet for the component
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  gridImage: {
-    flex: 1,
-  },
-  itemInfo: {
-    padding: 8,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-    borderRadius: BORDER_RADIUS,
-    margin: 16,
-  },
-  imageContainer: {
-    flex: 1,
-    width: screenWidth,
-    height: screenHeight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  fullscreenImage: {
-    width: screenWidth,
-    height: screenHeight,
-  },
-  fullscreenControls: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    // Ensure controls don't block interaction with the image itself unless explicitly on a button
-    pointerEvents: 'box-none',
-  },
-  topControls: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 56, // Adjust for safe area (notch, status bar)
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  topRightControls: {
-    gap: 8,
-    flexDirection: 'row',
-  },
-  bottomControls: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    paddingBottom: 46, // Adjust for safe area (home indicator)
-  },
-  thumbnailContainer: {
-    paddingHorizontal: 16,
-    alignItems: 'center', // Vertically center thumbnails
-  },
-  thumbnailItem: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    borderWidth: 1,
-    overflow: 'hidden',
-    borderColor: 'transparent',
-  },
-  thumbnailImage: {
-    width: '100%',
-    height: '100%',
-  },
-});
