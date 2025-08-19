@@ -122,7 +122,7 @@ export default function CreateStory() {
         placeholder="Say something..."
         value={caption}
         onChangeText={setCaption}
-        className="mb-6 border p-2 rounded-lg"
+        className="p-2 mb-6 border rounded-lg"
       />
       <TouchableOpacity onPress={pickMedia} className="w-[333px] h-12 mb-4 bg-blue-500 rounded-lg items-center justify-center">
         <Text className="text-white">Add Media</Text>
