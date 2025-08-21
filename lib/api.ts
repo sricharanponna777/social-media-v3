@@ -1,4 +1,3 @@
-import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { API_URL } from "../constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -315,6 +314,135 @@ class ApiService {
       );
     } catch (error) {
       console.error('Failed to record story view:', error);
+      throw error;
+    }
+  }
+
+  // ---------------------------FRIEND ROUTES---------------------------
+  async getFriends() {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.get('api/friends', undefined, auth_token);
+    } catch (error) {
+      console.error('Failed to fetch friends:', error);
+      throw error;
+    }
+  }
+
+  async getFriendRequests() {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.get('api/friends/requests', undefined, auth_token);
+    } catch (error) {
+      console.error('Failed to fetch friend requests:', error);
+      throw error;
+    }
+  }
+
+  async sendFriendRequest(receiverId: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.post(
+        'api/friends/request',
+        { receiverId },
+        auth_token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+    } catch (error) {
+      console.error('Failed to send friend request:', error);
+      throw error;
+    }
+  }
+
+  async acceptFriendRequest(requestId: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.post(
+        `api/friends/request/${requestId}/accept`,
+        {},
+        auth_token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+    } catch (error) {
+      console.error('Failed to accept friend request:', error);
+      throw error;
+    }
+  }
+
+  async rejectFriendRequest(requestId: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.post(
+        `api/friends/request/${requestId}/reject`,
+        {},
+        auth_token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+    } catch (error) {
+      console.error('Failed to reject friend request:', error);
+      throw error;
+    }
+  }
+
+  async removeFriend(friendshipId: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.delete(`api/friends/${friendshipId}`, auth_token);
+    } catch (error) {
+      console.error('Failed to remove friend:', error);
+      throw error;
+    }
+  }
+
+  async blockFriend(friendshipId: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.post(
+        `api/friends/${friendshipId}/block`,
+        {},
+        auth_token,
+        undefined,
+        { 'Content-Type': 'application/json' }
+      );
+    } catch (error) {
+      console.error('Failed to block friend:', error);
+      throw error;
+    }
+  }
+
+  async checkFriendshipStatus(otherUserId: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.get(`api/friends/status/${otherUserId}`, undefined, auth_token);
+    } catch (error) {
+      console.error('Failed to check friendship status:', error);
       throw error;
     }
   }
