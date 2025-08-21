@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Linking, Platform, View, Text, TextInput, TouchableOpacity, Image } from 'react-native'
+import { Alert, Linking, Platform } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
-import { VideoView } from 'expo-video'
+import { View } from '@/components/ui/view'
+import { Text } from '@/components/ui/text'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Image } from '@/components/ui/image'
+import { Video } from '@/components/ui/video'
 import apiService from '@/lib/api'
 import { useRouter } from 'expo-router'
 
@@ -112,28 +117,28 @@ export default function CreateStory() {
       {media && (
         <View className="mb-6" style={{ width: '100%', height: 300 }}>
           {mediaType === 'image' ? (
-            <Image source={{ uri: media.uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <Image source={{ uri: media.uri }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
           ) : (
-            <VideoView source={{ uri: media.uri }} style={{ width: '100%', height: '100%' }} />
+            <Video source={{ uri: media.uri }} style={{ width: '100%', height: '100%' }} />
           )}
         </View>
       )}
-      <TextInput
+      <Input
         placeholder="Say something..."
         value={caption}
         onChangeText={setCaption}
         className="p-2 mb-6 border rounded-lg"
       />
-      <TouchableOpacity onPress={pickMedia} className="w-[333px] h-12 mb-4 bg-blue-500 rounded-lg items-center justify-center">
-        <Text className="text-white">Add Media</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+      <Button onPress={pickMedia} className="w-[333px] h-12 mb-4">
+        Add Media
+      </Button>
+      <Button
         onPress={handleCreateStory}
-        className="w-[333px] h-12 bg-green-500 rounded-lg items-center justify-center"
+        className="w-[333px] h-12"
         disabled={!mediaUrl || loading}
       >
-        <Text className="text-white">Share Story</Text>
-      </TouchableOpacity>
+        Share Story
+      </Button>
     </View>
   )
 }

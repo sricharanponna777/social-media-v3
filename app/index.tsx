@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View } from '@/components/ui/view';
+import { Text } from '@/components/ui/text';
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,18 +25,22 @@ export default function WelcomeScreen() {
     <View className="items-center justify-center flex-1 p-5">
       <Text className="text-3xl font-bold mb-2.5 text-center">Welcome to Our App!</Text>
       <Text className="text-lg text-center mb-7.5">Connect with friends, share your moments, and explore.</Text>
-      <TouchableOpacity
-        onPress={() => router.replace('/login')}
-        className="bg-green-500 dark:bg-green-600 rounded-lg mt-5 px-4 py-2"
+      <Button
+        onPress={() => router.replace('/login')} //
+        // color="#007AFF" 
+        className="bg-green-500 dark:bg-green-600 rounded-[12.5%] mt-5"
+        variant={'ghost'}
       >
-        <Text className="text-white">Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => router.replace('/register')}
-        className="bg-green-500 dark:bg-green-600 rounded-lg mt-5 px-4 py-2"
+        Login
+      </Button>
+      <Button
+        onPress={() => router.replace('/register')} //
+        // color="#007AFF" 
+        className="bg-green-500 dark:bg-green-600 rounded-[12.5%] mt-5"
+        variant={'ghost'}
       >
-        <Text className="text-white">Register</Text>
-      </TouchableOpacity>
+        Register
+      </Button>
     </View>
   );
 }

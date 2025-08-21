@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { TouchableOpacity, View, Text, Image } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { VideoView } from 'expo-video'
+import { View } from '@/components/ui/view'
+import { Text } from '@/components/ui/text'
+import { Image } from '@/components/ui/image'
+import { Video } from '@/components/ui/video'
+import { Icon } from '@/components/ui/icon'
 import { ArrowLeft } from 'lucide-react-native'
 import apiService from '@/lib/api'
 import { API_URL } from '@/constants'
@@ -45,19 +49,19 @@ export default function StoryView() {
         style={{ position: 'absolute', top: 40, left: 20, zIndex: 10 }}
         onPress={() => router.back()}
       >
-        <ArrowLeft size={24} color="white" />
+        <Icon name={ArrowLeft} size={24} color="white" />
       </TouchableOpacity>
       {story.media_type === 'video' ? (
-        <VideoView
+        <Video
           source={{ uri: `${API_URL}${story.media_url}` }}
           style={{ width: '100%', height: '100%' }}
-          shouldPlay
+          autoPlay
         />
       ) : (
         <Image
           source={{ uri: `${API_URL}${story.media_url}` }}
           style={{ width: '100%', height: '100%' }}
-          resizeMode="contain"
+          contentFit="contain"
         />
       )}
       {story.caption ? (

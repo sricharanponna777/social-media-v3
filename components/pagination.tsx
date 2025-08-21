@@ -1,6 +1,9 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import React from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { Icon } from './ui/icon';
+import { Text } from './ui/text';
+import { View } from './ui/view';
 
 type PaginationProps = {
   currentPage: number;
@@ -54,13 +57,13 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         onPress={() => onPageChange(currentPage - 1)}
       >
-        <ChevronLeft />
+        <Icon name={ChevronLeft} className="text-foreground" />
       </TouchableOpacity>
 
       {/* Page Numbers */}
       {visiblePages.map((page, index) =>
         page === '...' ? (
-          <Text key={index} className="mx-2">
+          <Text key={index} className="mx-2 text-foreground">
             ...
           </Text>
         ) : (
@@ -74,7 +77,15 @@ const Pagination: React.FC<PaginationProps> = ({
             onPress={() => onPageChange(page as number)}
             disabled={page === currentPage}
           >
-            <Text className="font-bold">{page}</Text>
+            <Text
+              className={`font-bold ${
+                page === currentPage
+                  ? 'text-primary-foreground'
+                  : 'text-card-foreground'
+              }`}
+            >
+              {page}
+            </Text>
           </TouchableOpacity>
         )
       )}
@@ -85,7 +96,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages}
         onPress={() => onPageChange(currentPage + 1)}
       >
-        <ChevronRight />
+        <Icon name={ChevronRight} className="text-foreground" />
       </TouchableOpacity>
     </View>
   );

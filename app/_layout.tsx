@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from '@/theme/theme-provider';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ToastProvider } from '@/components/ui/toast';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { SocketProvider } from '@/contexts/SocketContext';
@@ -76,12 +77,14 @@ function InnerLayout() {
       }}
       // className={`flex-1 pt-[${insets.top}] pl-[${insets.left}] pr-[${insets.right}] dark:bg-black bg-white`}
     >
-      <SafeAreaProvider>
-        <ThemeProvider>
-          {renderContent()}
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </SafeAreaProvider>
+      <ToastProvider>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            {renderContent()}
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </ToastProvider>
     </GestureHandlerRootView>
   );
 }

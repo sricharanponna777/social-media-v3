@@ -1,52 +1,59 @@
-import React, { useState } from 'react'
-import { View, TextInput, Text, TouchableOpacity } from 'react-native'
-import apiService from '@/lib/api'
-import { useRouter } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { InputOTP } from "@/components/ui/input-otp";
+import React, { useState } from "react";
+import { View } from "@/components/ui/view";
+import apiService from "@/lib/api";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function VerifyOTP() {
-  const [otp, setOtp] = useState('')
-  const [error, setError] = useState('')
-  const router = useRouter()
-  let email: string | null = null
+  let email: string | null = null;
+  let phone: string | null = null;
   const fetchData = async () => {
-    email = await AsyncStorage.getItem('email')
-    await AsyncStorage.getItem('phone')
+    email = await AsyncStorage.getItem('email');
+    phone = await AsyncStorage.getItem('phone');
   }
-  fetchData()
-
-  const handleVerify = async (code: string) => {
+  fetchData().then(() => {
+    console.log('Email:', email);
+    console.log('Phone:', phone);
+  });
+  const [otp, setOtp] = useState<string>('')
+  const [error, setError] = useState<string>('')
+  
+  const handleVerify = async (otp: string) => {
     try {
-      await apiService.verifyOtp({ otp: code, email })
-      await AsyncStorage.removeItem('otp')
-      await AsyncStorage.removeItem('email')
+      const response = await apiService.verifyOtp({
+        otp,
+        email
+      });
+      console.log('Verify response:', response);
+      await AsyncStorage.removeItem('otp');
+      await AsyncStorage.removeItem('email');
       await AsyncStorage.removeItem('phone')
-      router.replace('/(main)/(tabs)/feed')
+      const authToken = response.token;
+      console.log('Token:', authToken);
+      const router = useRouter()
+      router.replace('/(main)/(tabs)/feed');
     } catch (errorr: any) {
       if (errorr.response?.status === 401) {
-        setError('Invalid OTP')
-        return
+        console.log('OTP is invalid');
+        setError('Invalid OTP');
+        return;
       }
-      console.error('Verify error:', errorr)
+      console.error('Verify error:', errorr);
     }
-  }
+  } 
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <TextInput
+      <InputOTP
+        length={6}
         value={otp}
-        onChangeText={(val) => {
-          setOtp(val)
-          if (val.length === 6) handleVerify(val)
+        onChangeText={setOtp}
+        onComplete={(value) => {
+          handleVerify(value);
         }}
-        keyboardType="number-pad"
-        maxLength={6}
-        style={{ borderWidth: 1, width: 200, padding: 8, textAlign: 'center', borderRadius: 8 }}
+        error={error}
       />
-      {error ? <Text style={{ color: 'red', marginTop: 8 }}>{error}</Text> : null}
-      <TouchableOpacity onPress={() => handleVerify(otp)} style={{ marginTop: 16, backgroundColor: 'green', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
-        <Text style={{ color: 'white' }}>Verify</Text>
-      </TouchableOpacity>
     </View>
   )
 }

@@ -1,5 +1,6 @@
+import { View } from '@/components/ui/view'
+import { Text } from '@/components/ui/text'
 import React, { useEffect, useState } from 'react'
-import { View } from 'react-native'
 import { FlashList } from '@shopify/flash-list';
 import apiService from '@/lib/api';
 import PostCard from '@/components/PostCard';
