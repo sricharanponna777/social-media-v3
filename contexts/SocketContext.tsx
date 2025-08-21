@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { io, Socket } from 'socket.io-client';
-import { Alert } from 'react-native';
 
 type FriendRequest = {
   id: string;
@@ -28,6 +27,7 @@ type SocketContextType = {
   onFriendRequestAccepted: (callback: (data: FriendEvent) => void) => () => void;
   onFriendRequestRejected: (callback: (data: FriendEvent) => void) => () => void;
   onFriendRemoved: (callback: (data: FriendEvent) => void) => () => void;
+  onFriendBlocked: (callback: (data: FriendEvent) => void) => () => void;
 };
 
 const SocketContext = createContext<SocketContextType>({
@@ -37,6 +37,7 @@ const SocketContext = createContext<SocketContextType>({
   onFriendRequestAccepted: () => () => {},
   onFriendRequestRejected: () => () => {},
   onFriendRemoved: () => () => {},
+  onFriendBlocked: () => () => {},
 });
 
 const SOCKET_URL = 'http://192.168.1.233:5001'; // Change to your backend IP
@@ -69,9 +70,16 @@ export const SocketProvider = ({ token, children }: { token: string; children: R
   
   const onFriendRemoved = useCallback((callback: (data: FriendEvent) => void) => {
     if (!socket) return () => {};
-    
+
     socket.on('friend_removed', callback);
     return () => socket.off('friend_removed', callback);
+  }, [socket]);
+
+  const onFriendBlocked = useCallback((callback: (data: FriendEvent) => void) => {
+    if (!socket) return () => {};
+
+    socket.on('friend_blocked', callback);
+    return () => socket.off('friend_blocked', callback);
   }, [socket]);
 
   // Connect socket on mount
@@ -123,7 +131,8 @@ export const SocketProvider = ({ token, children }: { token: string; children: R
       onFriendRequest,
       onFriendRequestAccepted,
       onFriendRequestRejected,
-      onFriendRemoved
+      onFriendRemoved,
+      onFriendBlocked
     }}>
       {children}
     </SocketContext.Provider>
