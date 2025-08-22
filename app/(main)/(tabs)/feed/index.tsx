@@ -1,5 +1,3 @@
-import { View } from '@/components/ui/view'
-import { Text } from '@/components/ui/text'
 import React, { useEffect, useState } from 'react'
 import { FlashList } from '@shopify/flash-list';
 import apiService from '@/lib/api';
@@ -7,6 +5,7 @@ import PostCard from '@/components/PostCard';
 import { useHeaderHeight } from "@react-navigation/elements";
 import Pagination from '@/components/pagination';
 import StoriesBar, { StoryItem } from '@/components/StoriesBar';
+import { View } from 'react-native';
 
 interface Post {
   id: string;
@@ -65,6 +64,7 @@ export default function FeedScreen() {
         renderItem={({ item }) => <PostCard post={item} />}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={<StoriesBar stories={stories} />}
+        disableAutoLayout
       />
 
       {/* Pagination component */}

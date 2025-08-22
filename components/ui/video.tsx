@@ -23,6 +23,7 @@ import {
 interface VideoProps {
   source: VideoSource;
   style?: ViewStyle;
+  className?: string;
   seekBy?: number; // seconds to seek by on double tap
   autoPlay?: boolean;
   loop?: boolean;
@@ -174,11 +175,10 @@ export const Video = forwardRef<VideoView, VideoProps>(
       }
 
       // Hide controls after 3 seconds
-      hideControlsTimeout.current = setTimeout(() => {
+      hideControlsTimeout.current = parseInt(setTimeout(() => {
         hideControls();
-      }, 3000);
+      }, 3000).toString())
     }, [controlsOpacity]);
-
     const hideControls = useCallback(() => {
       Animated.timing(controlsOpacity, {
         toValue: 0,
@@ -204,7 +204,7 @@ export const Video = forwardRef<VideoView, VideoProps>(
       }
 
       // Hide play icon after 1 second
-      hidePlayIconTimeout.current = setTimeout(() => {
+      hidePlayIconTimeout.current = parseInt(setTimeout(() => {
         Animated.timing(playIconOpacity, {
           toValue: 0,
           duration: 200,
@@ -212,7 +212,7 @@ export const Video = forwardRef<VideoView, VideoProps>(
         }).start(() => {
           setShowPlayIcon(false);
         });
-      }, 1000);
+      }, 1000).toString());
     }, [playIconOpacity]);
 
     // Handle single tap (play/pause)

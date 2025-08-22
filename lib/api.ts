@@ -31,10 +31,10 @@ export interface CreatePostData {
 }
 
 export interface CreateStoryData {
-  mediaUrl: string;
+  mediaBase64: string;
   mediaType: 'image' | 'video';
   caption?: string;
-  duration?: number;
+  mimeType?: string;
 }
 
 export interface ViewStoryData {

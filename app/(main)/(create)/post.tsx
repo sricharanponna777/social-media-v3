@@ -4,11 +4,11 @@ import {
   Image,
   Linking,
   Platform,
+  Text
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 
 import { View } from '@/components/ui/view'
-import { Text } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -188,13 +188,13 @@ export default function CreatePost() {
   }
 
   return (
-    <View className="flex-1 px-6 py-12">
+    <View className="flex-1 gap-6 px-6 py-12">
       {/* Title */}
-      <Text className="mb-6 text-2xl font-bold">Create Post</Text>
+      <Text className="text-2xl font-bold text-black dark:text-white">Create Post</Text>
 
       {/* Media Picker */}
-      <View className="mb-6">
-        <Button onPress={() => setIsVisible(true)} className="w-[333px] h-12">
+      <View>
+        <Button onPress={() => setIsVisible(true)} className="w-full h-12">
           Add Media
         </Button>
 
@@ -247,7 +247,7 @@ export default function CreatePost() {
       </View>
 
       {/* Caption Input */}
-      <View className="mb-6">
+      <View>
         <Input
           placeholder="Write a caption..."
           value={caption}
@@ -256,8 +256,8 @@ export default function CreatePost() {
       </View>
 
       {/* Visibility Tabs */}
-      <View className="items-center mb-6">
-        <Text className="mb-3 text-base font-bold">Visibility</Text>
+      <View className="items-center">
+        <Text className="mb-3 text-base font-bold text-black dark:text-white">Visibility</Text>
         <Tabs defaultValue={tabsValue} onValueChange={setTabsValue}>
           <TabsList style={{ width: '100%' }}>
             <TabsTrigger value="public">Public</TabsTrigger>
@@ -268,11 +268,11 @@ export default function CreatePost() {
       </View>
 
       {/* Create Button */}
-      <View className="items-center mt-3">
+      <View className="items-center">
         <Button
           onPress={handleCreatePost}
           disabled={createPostDisabled || loading}
-          className="w-[333px] h-12"
+          className="w-full h-12"
         >
           {loading ? 'Posting...' : 'Create Post'}
         </Button>

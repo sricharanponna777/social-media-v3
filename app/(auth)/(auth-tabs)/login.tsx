@@ -79,6 +79,7 @@ export default function Login() {
       });
       console.log('Login response:', response);
       loginSuccessToast();
+      router.replace('/feed');
     } catch (error: string | any) {
       console.error('Login error:', error);
       loginErrorToast(error)
@@ -87,7 +88,6 @@ export default function Login() {
         email: '',
         password: ''
       });
-      router.replace('/feed');
     }
   };
 
