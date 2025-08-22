@@ -5,7 +5,7 @@ import PostCard from '@/components/PostCard';
 import { useHeaderHeight } from "@react-navigation/elements";
 import Pagination from '@/components/pagination';
 import StoriesBar, { StoryItem } from '@/components/StoriesBar';
-import { View } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 interface Post {
   id: string;
@@ -59,12 +59,11 @@ export default function FeedScreen() {
 
   return (
     <View style={{ flex: 1, paddingTop }}>
-      <FlashList
+      <FlatList
         data={posts}
         renderItem={({ item }) => <PostCard post={item} />}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={<StoriesBar stories={stories} />}
-        disableAutoLayout
       />
 
       {/* Pagination component */}

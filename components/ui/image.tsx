@@ -122,7 +122,7 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
 
         {/* Loading indicator */}
         {isLoading && showLoadingIndicator && (
-          <View className="absolute inset-0 justify-center items-center">
+          <View className="absolute inset-0 items-center justify-center">
             <ActivityIndicator
               size={loadingIndicatorSize}
               color={loadingIndicatorColor || primaryColor}
@@ -132,11 +132,11 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
 
         {/* Error fallback */}
         {hasError && showErrorFallback && (
-          <View className="absolute inset-0 justify-center items-center p-2">
+          <View className="absolute inset-0 items-center justify-center p-2">
             <Text
               variant='caption'
               style={{ color: textColor }}
-              className="text-center text-xs"
+              className="text-xs text-center"
               numberOfLines={2}
             >
               {errorFallbackText}

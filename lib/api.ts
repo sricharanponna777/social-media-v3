@@ -85,7 +85,7 @@ class Api {
   }
 
   async delete(url: string, token?: string, params?: any, headers?: any) {
-    const response = await axios.delete(`${API_URL}${url}`, {
+    const response = await axios.delete(`${API_URL}/${url}`, {
       params,
       headers: this.buildHeaders(token, headers),
     });
