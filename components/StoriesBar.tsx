@@ -1,8 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
-import { FlatList, TouchableOpacity } from 'react-native';
+import { View, FlatList, Text, TouchableOpacity } from 'react-native';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
 import { useRouter } from 'expo-router';
 import { API_URL } from '@/constants';
 
@@ -55,9 +53,9 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories }) => {
               <AvatarImage
                 source={{ uri }}
               />
-            ) : null}
+            ) : <Text>{item.username?.[0]}{item.username?.[1] || ''}</Text>}
           </Avatar>
-          <Text variant="caption" numberOfLines={1} style={{ marginTop: 4, maxWidth: ITEM_WIDTH }}>
+          <Text numberOfLines={1} style={{ marginTop: 4, maxWidth: ITEM_WIDTH }} className={`mt-1 max-w-[${ITEM_WIDTH}]`}>
             {item.username || 'User'}
           </Text>
         </TouchableOpacity>
@@ -78,7 +76,7 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories }) => {
   if (!data.length) return null;
 
   return (
-    <View style={{ paddingVertical: 10 }}>
+    <View className='py-2.5 bg-zinc-200 dark:bg-zinc-800 rounded-3xl'>
       <FlatList
         horizontal
         data={data}

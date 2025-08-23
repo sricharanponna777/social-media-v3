@@ -1,22 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList } from 'react-native';
-import { View } from '@/components/ui/view';
-import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
+import { FlatList, Text, View, Button } from 'react-native';
 import { useToast } from '@/components/ui/toast';
 import apiService from '@/lib/api';
 import { useSocket } from '@/contexts/SocketContext';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 interface FriendRequest {
   id: string;
   user_id: string;
   username: string;
-  display_name: string;
   avatar_url: string | null;
   created_at: string;
 }
 
 const FriendsScreen = () => {
+  const pt = useHeaderHeight()
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const {
     onFriendRequest,
@@ -43,20 +41,20 @@ const FriendsScreen = () => {
 
   useEffect(() => {
     const offRequest = onFriendRequest((data) => {
-      toast.info('New friend request', `${data.display_name} sent you a request`);
+      toast.info('New friend request', `${data.username} sent you a request`);
       setRequests((prev) => [data, ...prev]);
     });
     const offAccepted = onFriendRequestAccepted((data) =>
-      toast.success('Request accepted', `${data.display_name} accepted your request`)
+      toast.success('Request accepted', `${data.username} accepted your request`)
     );
     const offRejected = onFriendRequestRejected((data) =>
-      toast.info('Request rejected', `${data.display_name} rejected your request`)
+      toast.info('Request rejected', `${data.username} rejected your request`)
     );
     const offRemoved = onFriendRemoved((data) =>
-      toast.info('Friend removed', `${data.display_name} removed you`)
+      toast.info('Friend removed', `${data.username} removed you`)
     );
     const offBlocked = onFriendBlocked((data) =>
-      toast.error('Blocked', `${data.display_name} blocked you`)
+      toast.error('Blocked', `${data.username} blocked you`)
     );
     return () => {
       offRequest();
@@ -87,18 +85,18 @@ const FriendsScreen = () => {
 
   const renderItem = ({ item }: { item: FriendRequest }) => (
     <View className="flex-row items-center justify-between px-4 py-2 border-b border-gray-200">
-      <Text className="font-medium">{item.display_name || item.username}</Text>
+      <Text className="font-medium">{item.username}</Text>
       <View className="flex-row space-x-2">
-        <Button size="sm" label="Accept" onPress={() => handleAccept(item.id)} />
-        <Button size="sm" variant="outline" label="Reject" onPress={() => handleReject(item.id)} />
+        <Button title="Accept" onPress={() => handleAccept(item.id)} />
+        <Button title="Reject" onPress={() => handleReject(item.id)} />
       </View>
     </View>
   );
 
   return (
-    <View className="flex-1">
+    <View className={`flex-1 bg-[#F2F2F7] dark:bg-[#1C1C1E] pt-[${pt}]`}>
       <View className="p-4">
-        <Text className="text-base font-semibold">
+        <Text className={`text-base font-semibold`}>
           Connection: {isConnected ? 'online' : 'offline'}
         </Text>
       </View>
@@ -106,7 +104,7 @@ const FriendsScreen = () => {
         data={requests}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        ListEmptyComponent={<Text className="text-center mt-4">No pending requests</Text>}
+        ListEmptyComponent={<Text className="mt-4 text-center">No pending requests</Text>}
       />
     </View>
   );

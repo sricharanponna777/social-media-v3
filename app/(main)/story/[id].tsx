@@ -26,7 +26,8 @@ interface Story {
 export default function StoryView() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
-  const [story, setStory] = useState<Story | null>(null)
+  const [stories, setStories] = useState<Story[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   const progress = useRef(new Animated.Value(0)).current
   const animationRef = useRef<Animated.CompositeAnimation | null>(null)
@@ -34,17 +35,44 @@ export default function StoryView() {
 
   // Load story
   useEffect(() => {
-    const loadStory = async () => {
+    const loadStories = async () => {
       try {
-        const data: Story = await apiService.getStory(id as string)
-        setStory(data)
-        await apiService.viewStory(id as string, { completed: true })
+        const data: Story[] = await apiService.getFeedStories()
+        setStories(data)
+        const index = data.findIndex((s) => s.id === id)
+        setCurrentIndex(index !== -1 ? index : 0)
       } catch (error) {
-        console.error('Failed to load story:', error)
+        console.error('Failed to load stories:', error)
       }
     }
-    loadStory()
+    loadStories()
   }, [id])
+
+  const story = stories[currentIndex]
+
+  useEffect(() => {
+    if (story) {
+      apiService
+        .viewStory(story.id, { completed: true })
+        .catch((err) => console.error('Failed to record story view:', err))
+    }
+  }, [story])
+
+  const handleNext = () => {
+    if (currentIndex < stories.length - 1) {
+      setCurrentIndex((prev) => prev + 1)
+    } else {
+      router.back()
+    }
+  }
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1)
+    } else {
+      router.back()
+    }
+  }
 
   // Animate progress
   const startProgress = (duration: number) => {
@@ -115,7 +143,7 @@ export default function StoryView() {
 
       {/* Back Button */}
       <TouchableOpacity
-        style={{ position: 'absolute', top: 40, left: 20, zIndex: 10 }}
+        className='absolute z-10 top-10 left-10'
         onPress={() => router.back()}
       >
         <Icon name={ArrowLeft} size={24} color="white" />
@@ -125,29 +153,28 @@ export default function StoryView() {
       <Pressable
         style={{ flex: 1 }}
         onPressIn={pauseProgress}
-        onPressOut={resumeProgress}
-      >
+        onPressOut={resumeProgress}>
         {story.media_type === 'video' ? (
           <Video
             source={{ uri: `${API_URL}${story.media_url}` }}
-            style={{ width: '100%', height: '100%' }}
+            className='w-full h-full'
             autoPlay
           />
         ) : (
           <Image
             source={{ uri: `${API_URL}${story.media_url}` }}
-            style={{ width: '100%', height: '100%' }}
+            className='w-full h-full'
             contentFit="contain"
           />
         )}
       </Pressable>
 
       {/* Caption */}
-      {story.caption && (
+      {story.caption ? (
         <View className="absolute left-0 right-0 px-4 bottom-10">
           <Text className="text-lg text-white">{story.caption}</Text>
         </View>
-      )}
+      ) : null}
     </View>
   )
 }
