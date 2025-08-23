@@ -20,20 +20,48 @@ interface Story {
 export default function StoryView() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
-  const [story, setStory] = useState<Story | null>(null)
+  const [stories, setStories] = useState<Story[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
-    const loadStory = async () => {
+    const loadStories = async () => {
       try {
-        const data: Story = await apiService.getStory(id as string)
-        setStory(data)
-        await apiService.viewStory(id as string, { completed: true })
+        const data: Story[] = await apiService.getFeedStories()
+        setStories(data)
+        const index = data.findIndex((s) => s.id === id)
+        setCurrentIndex(index !== -1 ? index : 0)
       } catch (error) {
-        console.error('Failed to load story:', error)
+        console.error('Failed to load stories:', error)
       }
     }
-    loadStory()
+    loadStories()
   }, [id])
+
+  const story = stories[currentIndex]
+
+  useEffect(() => {
+    if (story) {
+      apiService
+        .viewStory(story.id, { completed: true })
+        .catch((err) => console.error('Failed to record story view:', err))
+    }
+  }, [story])
+
+  const handleNext = () => {
+    if (currentIndex < stories.length - 1) {
+      setCurrentIndex((prev) => prev + 1)
+    } else {
+      router.back()
+    }
+  }
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1)
+    } else {
+      router.back()
+    }
+  }
 
   if (!story) {
     return (
@@ -69,6 +97,27 @@ export default function StoryView() {
           <Text className="text-white">{story.caption}</Text>
         </View>
       ) : null}
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          flexDirection: 'row',
+        }}
+      >
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          activeOpacity={1}
+          onPress={handlePrevious}
+        />
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          activeOpacity={1}
+          onPress={handleNext}
+        />
+      </View>
     </View>
   )
 }
