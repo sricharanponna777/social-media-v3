@@ -48,14 +48,14 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories }) => {
           onPress={() => router.push(`/story/${item.id}`)}
           style={{ alignItems: 'center', marginRight: 12, width: ITEM_WIDTH }}
         >
-          <Avatar size={60} style={{ borderWidth: 2, borderColor: 'pink' }}>
+          <Avatar size={60}>
             {uri ? (
               <AvatarImage
                 source={{ uri }}
               />
-            ) : <Text>{item.username?.[0]}{item.username?.[1] || ''}</Text>}
+            ) : <Text className="flex-1 text-black dark:text-white">{item.username?.[0]}{item.username?.[1] || ''}</Text>}
           </Avatar>
-          <Text numberOfLines={1} style={{ marginTop: 4, maxWidth: ITEM_WIDTH }} className={`mt-1 max-w-[${ITEM_WIDTH}]`}>
+          <Text numberOfLines={1} style={{ marginTop: 4, maxWidth: ITEM_WIDTH }} className={`mt-1 text-black dark:text-white max-w-[${ITEM_WIDTH}]`}>
             {item.username || 'User'}
           </Text>
         </TouchableOpacity>

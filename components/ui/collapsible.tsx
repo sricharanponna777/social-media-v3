@@ -1,46 +1,9 @@
-import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { ChevronRight } from 'lucide-react-native';
-import { PropsWithChildren, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import * as CollapsiblePrimitive from '@rn-primitives/collapsible';
 
-export function Collapsible({
-  children,
-  title,
-}: PropsWithChildren & { title: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+const Collapsible = CollapsiblePrimitive.Root;
 
-  return (
-    <View>
-      <TouchableOpacity
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 6,
-        }}
-        onPress={() => setIsOpen((value) => !value)}
-        activeOpacity={0.8}
-      >
-        <Icon
-          name={ChevronRight}
-          size={18}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
-        />
+const CollapsibleTrigger = CollapsiblePrimitive.Trigger;
 
-        <Text variant='subtitle'>{title}</Text>
-      </TouchableOpacity>
+const CollapsibleContent = CollapsiblePrimitive.Content;
 
-      {isOpen && (
-        <View
-          style={{
-            marginTop: 6,
-            marginLeft: 24,
-          }}
-        >
-          {children}
-        </View>
-      )}
-    </View>
-  );
-}
+export { Collapsible, CollapsibleTrigger, CollapsibleContent };

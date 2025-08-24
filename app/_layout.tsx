@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/theme/theme-provider';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ToastProvider } from '@/components/ui/toast';
+import { PortalHost } from '@rn-primitives/portal';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { SocketProvider } from '@/contexts/SocketContext';
@@ -82,6 +83,7 @@ function InnerLayout() {
           <ThemeProvider>
             {renderContent()}
             <StatusBar style="auto" />
+            <PortalHost />
           </ThemeProvider>
         </SafeAreaProvider>
       </ToastProvider>

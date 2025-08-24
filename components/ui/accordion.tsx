@@ -1,175 +1,141 @@
 import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { ChevronRight } from 'lucide-react-native';
-import React, { createContext, useContext, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TextClassContext } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
+import * as AccordionPrimitive from '@rn-primitives/accordion';
+import { ChevronDown } from 'lucide-react-native';
+import { Platform, Pressable, View } from 'react-native';
+import Animated, {
+  FadeOutUp,
+  LayoutAnimationConfig,
+  LinearTransition,
+  useAnimatedStyle,
+  useDerivedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
-// Context for accordion state
-interface AccordionContextType {
-  type: 'single' | 'multiple';
-  collapsible?: boolean;
-  value?: string | string[];
-  onValueChange?: (value: string | string[]) => void;
-}
-
-const AccordionContext = createContext<AccordionContextType | null>(null);
-
-// Main Accordion component
-interface AccordionProps {
-  type: 'single' | 'multiple';
-  collapsible?: boolean;
-  defaultValue?: string | string[];
-  value?: string | string[];
-  onValueChange?: (value: string | string[]) => void;
-  children: React.ReactNode;
-}
-
-export function Accordion({
-  type,
-  collapsible = false,
-  defaultValue,
-  value: controlledValue,
-  onValueChange,
+function Accordion({
   children,
-}: AccordionProps) {
-  const [internalValue, setInternalValue] = useState<string | string[]>(
-    defaultValue || (type === 'multiple' ? [] : '')
+  ...props
+}: Omit<AccordionPrimitive.RootProps, 'asChild'> &
+  React.RefAttributes<AccordionPrimitive.RootRef>) {
+  return (
+    <LayoutAnimationConfig skipEntering>
+      <AccordionPrimitive.Root
+        {...(props as AccordionPrimitive.RootProps)}
+        asChild={Platform.OS !== 'web'}>
+        <Animated.View layout={LinearTransition.duration(200)}>{children}</Animated.View>
+      </AccordionPrimitive.Root>
+    </LayoutAnimationConfig>
   );
+}
 
-  const value = controlledValue !== undefined ? controlledValue : internalValue;
+function AccordionItem({
+  children,
+  className,
+  value,
+  ...props
+}: AccordionPrimitive.ItemProps & React.RefAttributes<AccordionPrimitive.ItemRef>) {
+  return (
+    <AccordionPrimitive.Item
+      className={cn(
+        'border-border border-b',
+        Platform.select({ web: 'last:border-b-0' }),
+        className
+      )}
+      value={value}
+      asChild
+      {...props}>
+      <Animated.View
+        className="native:overflow-hidden"
+        layout={Platform.select({ native: LinearTransition.duration(200) })}>
+        {children}
+      </Animated.View>
+    </AccordionPrimitive.Item>
+  );
+}
 
-  const handleValueChange = (newValue: string | string[]) => {
-    if (controlledValue === undefined) {
-      setInternalValue(newValue);
-    }
-    onValueChange?.(newValue);
-  };
+const Trigger = Platform.OS === 'web' ? View : Pressable;
+
+function AccordionTrigger({
+  className,
+  children,
+  ...props
+}: AccordionPrimitive.TriggerProps & {
+  children?: React.ReactNode;
+} & React.RefAttributes<AccordionPrimitive.TriggerRef>) {
+  const { isExpanded } = AccordionPrimitive.useItemContext();
+
+  const progress = useDerivedValue(
+    () => (isExpanded ? withTiming(1, { duration: 250 }) : withTiming(0, { duration: 200 })),
+    [isExpanded]
+  );
+  const chevronStyle = useAnimatedStyle(
+    () => ({
+      transform: [{ rotate: `${progress.value * 180}deg` }],
+    }),
+    [progress]
+  );
 
   return (
-    <AccordionContext.Provider
-      value={{
-        type,
-        collapsible,
-        value,
-        onValueChange: handleValueChange,
-      }}
-    >
-      <View style={{ width: '100%' }}>{children}</View>
-    </AccordionContext.Provider>
+    <TextClassContext.Provider
+      value={cn(
+        'text-left text-sm font-medium',
+        Platform.select({ web: 'group-hover:underline' })
+      )}>
+      <AccordionPrimitive.Header>
+        <AccordionPrimitive.Trigger {...props} asChild>
+          <Trigger
+            className={cn(
+              'flex-row items-start justify-between gap-4 rounded-md py-4 disabled:opacity-50',
+              Platform.select({
+                web: 'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 outline-none transition-all hover:underline focus-visible:ring-[3px] disabled:pointer-events-none [&[data-state=open]>svg]:rotate-180',
+              }),
+              className
+            )}>
+            <>{children}</>
+            <Animated.View style={chevronStyle}>
+              <Icon
+                as={ChevronDown}
+                size={16}
+                className={cn(
+                  'text-muted-foreground shrink-0',
+                  Platform.select({
+                    web: 'pointer-events-none translate-y-0.5 transition-transform duration-200',
+                  })
+                )}
+              />
+            </Animated.View>
+          </Trigger>
+        </AccordionPrimitive.Trigger>
+      </AccordionPrimitive.Header>
+    </TextClassContext.Provider>
   );
 }
 
-// AccordionItem component
-interface AccordionItemProps {
-  value: string;
-  children: React.ReactNode;
-}
-
-export function AccordionItem({ value, children }: AccordionItemProps) {
-  const context = useContext(AccordionContext);
-  if (!context) {
-    throw new Error('AccordionItem must be used within an Accordion');
-  }
-
-  const isOpen = Array.isArray(context.value)
-    ? context.value.includes(value)
-    : context.value === value;
-
-  const toggle = () => {
-    if (!context.onValueChange) return;
-
-    if (context.type === 'single') {
-      const newValue = isOpen && context.collapsible ? '' : value;
-      context.onValueChange(newValue);
-    } else {
-      const currentValues = Array.isArray(context.value) ? context.value : [];
-      const newValue = isOpen
-        ? currentValues.filter((v) => v !== value)
-        : [...currentValues, value];
-      context.onValueChange(newValue);
-    }
-  };
-
+function AccordionContent({
+  className,
+  children,
+  ...props
+}: AccordionPrimitive.ContentProps & React.RefAttributes<AccordionPrimitive.ContentRef>) {
+  const { isExpanded } = AccordionPrimitive.useItemContext();
   return (
-    <AccordionItemContext.Provider value={{ value, isOpen, toggle }}>
-      <View>{children}</View>
-    </AccordionItemContext.Provider>
+    <TextClassContext.Provider value="text-sm">
+      <AccordionPrimitive.Content
+        className={cn(
+          'overflow-hidden',
+          Platform.select({
+            web: isExpanded ? 'animate-accordion-down' : 'animate-accordion-up',
+          })
+        )}
+        {...props}>
+        <Animated.View
+          exiting={Platform.select({ native: FadeOutUp.duration(200) })}
+          className={cn('pb-4', className)}>
+          {children}
+        </Animated.View>
+      </AccordionPrimitive.Content>
+    </TextClassContext.Provider>
   );
 }
 
-// Context for accordion item
-interface AccordionItemContextType {
-  value: string;
-  isOpen: boolean;
-  toggle: () => void;
-}
-
-const AccordionItemContext = createContext<AccordionItemContextType | null>(
-  null
-);
-
-// AccordionTrigger component
-interface AccordionTriggerProps {
-  children: React.ReactNode;
-}
-
-export function AccordionTrigger({ children }: AccordionTriggerProps) {
-  const context = useContext(AccordionItemContext);
-  if (!context) {
-    throw new Error('AccordionTrigger must be used within an AccordionItem');
-  }
-
-  return (
-    <TouchableOpacity
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 6,
-      }}
-      onPress={context.toggle}
-      activeOpacity={0.8}
-    >
-      <Text variant='subtitle'>{children}</Text>
-      <Icon
-        name={ChevronRight}
-        size={18}
-        style={{
-          transform: [{ rotate: context.isOpen ? '90deg' : '0deg' }],
-        }}
-      />
-    </TouchableOpacity>
-  );
-}
-
-// AccordionContent component
-interface AccordionContentProps {
-  children: React.ReactNode;
-  style?: object;
-}
-
-export function AccordionContent({ children, style }: AccordionContentProps) {
-  const context = useContext(AccordionItemContext);
-  if (!context) {
-    throw new Error('AccordionContent must be used within an AccordionItem');
-  }
-
-  if (!context.isOpen) {
-    return null;
-  }
-
-  return (
-    <View
-      style={[
-        {
-          paddingBottom: 16,
-          paddingLeft: 0,
-        },
-        style,
-      ]}
-    >
-      {children}
-    </View>
-  );
-}
+export { Accordion, AccordionContent, AccordionItem, AccordionTrigger };

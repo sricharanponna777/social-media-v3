@@ -1,30 +1,24 @@
-import { View } from '@/components/ui/view';
-import { useThemeColor } from '@/hooks/useThemeColor';
-import React from 'react';
-import { ViewStyle } from 'react-native';
+import { cn } from '@/lib/utils';
+import * as SeparatorPrimitive from '@rn-primitives/separator';
 
-interface SeparatorProps {
-  orientation?: 'horizontal' | 'vertical';
-  style?: ViewStyle;
-}
-
-export function Separator({
+function Separator({
+  className,
   orientation = 'horizontal',
-  style,
-}: SeparatorProps) {
-  const borderColor = useThemeColor({}, 'border');
-
+  decorative = true,
+  ...props
+}: SeparatorPrimitive.RootProps & React.RefAttributes<SeparatorPrimitive.RootRef>) {
   return (
-    <View
-      style={[
-        {
-          backgroundColor: borderColor,
-          ...(orientation === 'horizontal'
-            ? { height: 1, width: '100%' }
-            : { width: 1, height: '100%' }),
-        },
-        style,
-      ]}
+    <SeparatorPrimitive.Root
+      decorative={decorative}
+      orientation={orientation}
+      className={cn(
+        'bg-border shrink-0',
+        orientation === 'horizontal' ? 'h-[1px] w-full' : 'h-full w-[1px]',
+        className
+      )}
+      {...props}
     />
   );
 }
+
+export { Separator };

@@ -14,6 +14,8 @@ import { ArrowLeft } from 'lucide-react-native'
 import apiService from '@/lib/api'
 import { API_URL } from '@/constants'
 import { Image } from 'expo-image'
+import { runOnJS, useSharedValue } from 'react-native-reanimated'
+import { Gesture } from 'react-native-gesture-handler'
 
 interface Story {
   id: string
@@ -99,6 +101,25 @@ export default function StoryView() {
     }
   }
 
+  const translateX = useSharedValue(0)
+
+  const panGesture = Gesture.Pan()
+    .onBegin(() => {
+      runOnJS(pauseProgress)()
+    })
+    .onUpdate((e) => {
+      translateX.value = e.translationX
+    })
+    .onEnd((e) => {
+      if (e.translationX < -50) {
+        runOnJS(handlePrevious)()
+      } else if (e.translationX > 50) {
+        runOnJS(handleNext)()
+      }
+      translateX.value = 0
+      runOnJS(resumeProgress)()
+    })
+
   const resumeProgress = () => {
     if (isPaused.current && story) {
       const remaining = (1 - (progress as any)._value) * story.duration * 1000
@@ -133,17 +154,14 @@ export default function StoryView() {
       {/* Progress Bar */}
       <View className="absolute top-0 left-0 right-0 z-10 h-1 bg-gray-700">
         <Animated.View
-          style={{
-            height: '100%',
-            backgroundColor: 'white',
-            width: progressWidth,
-          }}
+          style={{ width: progressWidth }}
+          className="h-full bg-white"
         />
       </View>
 
       {/* Back Button */}
       <TouchableOpacity
-        className='absolute z-10 top-10 left-10'
+        className="absolute z-10 top-10 left-10"
         onPress={() => router.back()}
       >
         <Icon name={ArrowLeft} size={24} color="white" />
@@ -151,21 +169,24 @@ export default function StoryView() {
 
       {/* Media with press/hold */}
       <Pressable
-        style={{ flex: 1 }}
+        className="flex-1"
         onPressIn={pauseProgress}
-        onPressOut={resumeProgress}>
+        onPressOut={resumeProgress}
+      >
         {story.media_type === 'video' ? (
           <Video
             source={{ uri: `${API_URL}${story.media_url}` }}
-            className='w-full h-full'
+            className="w-full h-full"
             autoPlay
           />
         ) : (
-          <Image
-            source={{ uri: `${API_URL}${story.media_url}` }}
-            className='w-full h-full'
-            contentFit="contain"
-          />
+          <View className="w-full h-full">
+            <Image
+              source={{ uri: `${API_URL}${story.media_url}` }}
+              style={{ flex: 1 }}   // instead of className
+              contentFit="contain"
+            />
+          </View>
         )}
       </Pressable>
 

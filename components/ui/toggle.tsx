@@ -1,347 +1,75 @@
 import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { useThemeColor } from '@/hooks/useThemeColor';
-import { CORNERS, FONT_SIZE, HEIGHT } from '@/theme/globals';
-import { LucideProps } from 'lucide-react-native';
-import React from 'react';
-import { TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+import { TextClassContext } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
+import * as TogglePrimitive from '@rn-primitives/toggle';
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
+import { Platform } from 'react-native';
 
-type ToggleVariant = 'default' | 'outline';
-type ToggleSize = 'default' | 'icon';
+const toggleVariants = cva(
+  cn(
+    'active:bg-muted group flex flex-row items-center justify-center gap-2 rounded-md',
+    Platform.select({
+      web: 'hover:bg-muted hover:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex cursor-default whitespace-nowrap outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:pointer-events-none [&_svg]:pointer-events-none',
+    })
+  ),
+  {
+    variants: {
+      variant: {
+        default: 'bg-transparent',
+        outline: cn(
+          'border-input active:bg-accent border bg-transparent shadow-sm shadow-black/5',
+          Platform.select({
+            web: 'hover:bg-accent hover:text-accent-foreground',
+          })
+        ),
+      },
+      size: {
+        default: 'h-10 min-w-10 px-2.5 sm:h-9 sm:min-w-9 sm:px-2',
+        sm: 'h-9 min-w-9 px-2 sm:h-8 sm:min-w-8 sm:px-1.5',
+        lg: 'h-11 min-w-11 px-3 sm:h-10 sm:min-w-10 sm:px-2.5',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
 
-interface ToggleProps {
-  children: React.ReactNode;
-  pressed?: boolean;
-  onPressedChange?: (pressed: boolean) => void;
-  variant?: ToggleVariant;
-  size?: ToggleSize;
-  disabled?: boolean;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
-}
-
-export function Toggle({
-  children,
-  pressed = false,
-  onPressedChange,
-  variant = 'default',
-  size = 'icon',
-  disabled = false,
-  style,
-  textStyle,
-}: ToggleProps) {
-  const primaryColor = useThemeColor({}, 'primary');
-  const primaryForegroundColor = useThemeColor({}, 'primaryForeground');
-  const secondaryColor = useThemeColor({}, 'secondary');
-  const secondaryForegroundColor = useThemeColor({}, 'secondaryForeground');
-  const borderColor = useThemeColor({}, 'border');
-
-  const handlePress = () => {
-    if (!disabled) {
-      onPressedChange?.(!pressed);
-    }
-  };
-
-  const getToggleStyle = (): ViewStyle => {
-    const baseStyle: ViewStyle = {
-      borderRadius: CORNERS,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row',
-    };
-
-    // Size variants - following button component pattern
-    switch (size) {
-      case 'icon':
-        Object.assign(baseStyle, {
-          width: HEIGHT,
-          height: HEIGHT,
-        });
-        break;
-      default:
-        Object.assign(baseStyle, { height: HEIGHT, paddingHorizontal: 32 });
-    }
-
-    // State and variant styles - following button component pattern
-    if (pressed) {
-      switch (variant) {
-        case 'outline':
-          return {
-            ...baseStyle,
-            backgroundColor: primaryColor,
-            borderWidth: 1,
-            borderColor: primaryColor,
-          };
-        default:
-          return {
-            ...baseStyle,
-            backgroundColor: primaryColor,
-          };
-      }
-    } else {
-      switch (variant) {
-        case 'outline':
-          return {
-            ...baseStyle,
-            backgroundColor: 'transparent',
-            borderWidth: 1,
-            borderColor: borderColor,
-          };
-        default:
-          return {
-            ...baseStyle,
-            backgroundColor: secondaryColor,
-          };
-      }
-    }
-  };
-
-  const getToggleTextStyle = (): TextStyle => {
-    const baseTextStyle: TextStyle = {
-      fontSize: FONT_SIZE,
-      fontWeight: '500',
-    };
-
-    if (pressed) {
-      switch (variant) {
-        case 'outline':
-          return { ...baseTextStyle, color: primaryForegroundColor };
-        default:
-          return { ...baseTextStyle, color: primaryForegroundColor };
-      }
-    } else {
-      switch (variant) {
-        case 'outline':
-          return { ...baseTextStyle, color: primaryColor };
-        default:
-          return { ...baseTextStyle, color: secondaryForegroundColor };
-      }
-    }
-  };
-
-  const toggleStyle = getToggleStyle();
-  const finalTextStyle = getToggleTextStyle();
-
-  return (
-    <TouchableOpacity
-      style={[toggleStyle, disabled && { opacity: 0.5 }, style]}
-      onPress={handlePress}
-      disabled={disabled}
-      activeOpacity={0.8}
-    >
-      {typeof children === 'string' ? (
-        <Text style={[finalTextStyle, textStyle]}>{children}</Text>
-      ) : (
-        children
-      )}
-    </TouchableOpacity>
-  );
-}
-
-type ToggleGroupType = 'single' | 'multiple';
-type ToggleGroupVariant = 'default' | 'outline';
-type ToggleGroupSize = 'default' | 'icon';
-
-interface ToggleGroupItem {
-  value: string;
-  label: string;
-  icon?: React.ComponentType<LucideProps>;
-  disabled?: boolean;
-}
-
-interface ToggleGroupProps {
-  type?: ToggleGroupType;
-  value?: string | string[];
-  onValueChange?: (value: string | string[]) => void;
-  items: ToggleGroupItem[];
-  variant?: ToggleGroupVariant;
-  size?: ToggleGroupSize;
-  disabled?: boolean;
-  style?: ViewStyle;
-  orientation?: 'horizontal' | 'vertical';
-}
-
-export function ToggleGroup({
-  type = 'single',
-  value,
-  onValueChange,
-  items,
-  variant = 'default',
-  size = 'default',
-  disabled = false,
-  style,
-  orientation = 'horizontal',
-}: ToggleGroupProps) {
-  const borderColor = useThemeColor({}, 'border');
-  const primaryColor = useThemeColor({}, 'primary');
-  const primaryForegroundColor = useThemeColor({}, 'primaryForeground');
-  const secondaryForegroundColor = useThemeColor({}, 'secondaryForeground');
-
-  const handleItemPress = (itemValue: string) => {
-    if (disabled) return;
-
-    if (type === 'single') {
-      // Single selection
-      const newValue = value === itemValue ? undefined : itemValue;
-      onValueChange?.(newValue || '');
-    } else {
-      // Multiple selection
-      const currentValues = Array.isArray(value) ? value : [];
-      const newValues = currentValues.includes(itemValue)
-        ? currentValues.filter((v) => v !== itemValue)
-        : [...currentValues, itemValue];
-      onValueChange?.(newValues);
-    }
-  };
-
-  const isItemPressed = (itemValue: string): boolean => {
-    if (type === 'single') {
-      return value === itemValue;
-    } else {
-      return Array.isArray(value) && value.includes(itemValue);
-    }
-  };
-
-  const containerStyle: ViewStyle = {
-    flexDirection: orientation === 'horizontal' ? 'row' : 'column',
-    borderWidth: 1,
-    borderColor: borderColor,
-    borderRadius: CORNERS,
-    overflow: 'hidden',
-    backgroundColor: 'transparent',
-  };
-
-  const getItemStyle = (index: number): ViewStyle => {
-    const isLast = index === items.length - 1;
-
-    const itemStyle: ViewStyle = {
-      flex: orientation === 'horizontal' ? 1 : 0,
-      borderRadius: 0,
-      borderWidth: 0,
-      borderRightWidth: orientation === 'horizontal' && !isLast ? 1 : 0,
-      borderBottomWidth: orientation === 'vertical' && !isLast ? 1 : 0,
-      borderColor: borderColor,
-    };
-
-    return itemStyle;
-  };
-
-  return (
-    <View style={[containerStyle, style]}>
-      {items.map((item, index) => (
-        <Toggle
-          key={item.value}
-          pressed={isItemPressed(item.value)}
-          onPressedChange={() => handleItemPress(item.value)}
-          variant={variant}
-          size={size}
-          disabled={disabled || item.disabled}
-          style={getItemStyle(index)}
-        >
-          {item.icon && item.label ? (
-            <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
-            >
-              <Icon
-                name={item.icon}
-                size={16}
-                strokeWidth={2.5}
-                color={
-                  isItemPressed(item.value)
-                    ? primaryForegroundColor
-                    : variant === 'outline'
-                    ? primaryColor
-                    : secondaryForegroundColor
-                }
-              />
-              <Text
-                style={{
-                  color: isItemPressed(item.value)
-                    ? primaryForegroundColor
-                    : variant === 'outline'
-                    ? primaryColor
-                    : secondaryForegroundColor,
-                }}
-              >
-                {item.label}
-              </Text>
-            </View>
-          ) : item.icon ? (
-            <Icon
-              name={item.icon}
-              size={16}
-              strokeWidth={2.5}
-              color={
-                isItemPressed(item.value)
-                  ? primaryForegroundColor
-                  : variant === 'outline'
-                  ? primaryColor
-                  : secondaryForegroundColor
-              }
-            />
-          ) : (
-            <Text
-              style={{
-                color: isItemPressed(item.value)
-                  ? primaryForegroundColor
-                  : variant === 'outline'
-                  ? primaryColor
-                  : secondaryForegroundColor,
-              }}
-            >
-              {item.label}
-            </Text>
-          )}
-        </Toggle>
-      ))}
-    </View>
-  );
-}
-
-// Convenience components for common use cases
-export function ToggleGroupSingle({
-  value,
-  onValueChange,
+function Toggle({
+  className,
+  variant,
+  size,
   ...props
-}: Omit<ToggleGroupProps, 'type' | 'value' | 'onValueChange'> & {
-  value?: string;
-  onValueChange?: (value: string) => void;
-}) {
-  const handleValueChange = (newValue: string | string[]) => {
-    // For single selection, we know it will always be a string
-    onValueChange?.(newValue as string);
-  };
-
+}: TogglePrimitive.RootProps &
+  VariantProps<typeof toggleVariants> &
+  React.RefAttributes<TogglePrimitive.RootRef>) {
   return (
-    <ToggleGroup
-      type='single'
-      value={value}
-      onValueChange={handleValueChange}
-      {...props}
-    />
+    <TextClassContext.Provider
+      value={cn(
+        'text-sm text-foreground font-medium',
+        props.pressed
+          ? 'text-accent-foreground'
+          : Platform.select({ web: 'group-hover:text-muted-foreground' }),
+        className
+      )}>
+      <TogglePrimitive.Root
+        className={cn(
+          toggleVariants({ variant, size }),
+          props.disabled && 'opacity-50',
+          props.pressed && 'bg-accent',
+          className
+        )}
+        {...props}
+      />
+    </TextClassContext.Provider>
   );
 }
 
-export function ToggleGroupMultiple({
-  value,
-  onValueChange,
-  ...props
-}: Omit<ToggleGroupProps, 'type' | 'value' | 'onValueChange'> & {
-  value?: string[];
-  onValueChange?: (value: string[]) => void;
-}) {
-  const handleValueChange = (newValue: string | string[]) => {
-    // For multiple selection, we know it will always be a string array
-    onValueChange?.(newValue as string[]);
-  };
-
-  return (
-    <ToggleGroup
-      type='multiple'
-      value={value}
-      onValueChange={handleValueChange}
-      {...props}
-    />
-  );
+function ToggleIcon({ className, ...props }: React.ComponentProps<typeof Icon>) {
+  const textClass = React.useContext(TextClassContext);
+  return <Icon className={cn('size-4 shrink-0', textClass, className)} {...props} />;
 }
+
+export { Toggle, ToggleIcon, toggleVariants };
