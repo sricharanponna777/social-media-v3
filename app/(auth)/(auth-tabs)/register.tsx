@@ -9,9 +9,8 @@ import {
   Plus,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { GroupedInput, GroupedInputItem } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { View, Pressable, LogBox, Alert } from 'react-native';
+import { View, Pressable, LogBox, Alert, Text, TextInput } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
@@ -104,71 +103,85 @@ export default function Register() {
 
   return (
     <View className="flex-1 gap-6 my-6 mx-4">
-      <GroupedInput title="Register">
-        {/* First Name and Last Name in one row */}
-        <View className="flex-row gap-3">
-          <View className="flex-1">
-          <GroupedInputItem
-              placeholder="First Name"
-              value={registerFields.firstName}
-              onChangeText={(text) => updateField('firstName', text)}
-              icon={User}
-              keyboardType="default"
-          />
+      <View className="rounded-xl border border-input bg-background p-4">
+        <Text className="mb-2 text-xl font-semibold">Register</Text>
+        <View className="gap-4">
+          {/* First Name and Last Name in one row */}
+          <View className="flex-row gap-3">
+            <View className="flex-1 flex-row items-center rounded-md border border-input px-3">
+              <User size={20} color={muted} />
+              <TextInput
+                className="flex-1 px-2 py-2 text-base"
+                placeholder="First Name"
+                value={registerFields.firstName}
+                onChangeText={(text: string) => updateField('firstName', text)}
+                keyboardType="default"
+              />
+            </View>
+            <View className="flex-1 flex-row items-center rounded-md border border-input px-3">
+              <User size={20} color={muted} />
+              <TextInput
+                className="flex-1 px-2 py-2 text-base"
+                placeholder="Last Name"
+                value={registerFields.lastName}
+                onChangeText={(text: string) => updateField('lastName', text)}
+                keyboardType="default"
+              />
+            </View>
           </View>
-          <View className="flex-1">
-          <GroupedInputItem
-              placeholder="Last Name"
-              value={registerFields.lastName}
-              onChangeText={(text) => updateField('lastName', text)}
-              icon={User}
-              keyboardType="default"
-          />
+
+          <View className="flex-row items-center rounded-md border border-input px-3">
+            <User size={20} color={muted} />
+            <TextInput
+              className="flex-1 px-2 py-2 text-base"
+              placeholder="Username"
+              value={registerFields.username}
+              onChangeText={(text: string) => updateField('username', text)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
           </View>
-        </View>
 
-      <GroupedInputItem
-          placeholder="Username"
-          value={registerFields.username}
-          onChangeText={(text) => updateField('username', text)}
-          icon={User}
-          keyboardType="email-address"
-          autoCapitalize="none"
-      />
+          <View className="flex-row items-center rounded-md border border-input px-3">
+            <Mail size={20} color={muted} />
+            <TextInput
+              className="flex-1 px-2 py-2 text-base"
+              placeholder="Email"
+              value={registerFields.email}
+              onChangeText={(text: string) => updateField('email', text)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              spellCheck={false}
+            />
+          </View>
 
-      <GroupedInputItem
-          placeholder="Email"
-          value={registerFields.email}
-          onChangeText={(text) => updateField('email', text)}
-          icon={Mail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          spellCheck={false}
-      />
-
-      <GroupedInputItem
-          placeholder="Password"
-          value={registerFields.password}
-          onChangeText={(text) => updateField('password', text)}
-          icon={Lock}
-          secureTextEntry={!showPassword}
-          rightComponent={
-          <Pressable onPress={() => setShowPassword(!showPassword)}>
+          <View className="flex-row items-center rounded-md border border-input px-3">
+            <Lock size={20} color={muted} />
+            <TextInput
+              className="flex-1 px-2 py-2 text-base"
+              placeholder="Password"
+              value={registerFields.password}
+              onChangeText={(text: string) => updateField('password', text)}
+              secureTextEntry={!showPassword}
+            />
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
               {showPassword ? (
-              <EyeOff size={22} color={muted} />
+                <EyeOff size={22} color={muted} />
               ) : (
-              <Eye size={22} color={muted} />
+                <Eye size={22} color={muted} />
               )}
-          </Pressable>
-          }
-      />
+            </Pressable>
+          </View>
+
           <View className="flex-row gap-3">
             {/* Country Code */}
-            <View className="flex-[0.7]">
-              <GroupedInputItem
+            <View className="flex-[0.7] flex-row items-center rounded-md border border-input px-3">
+              <Plus size={20} color={muted} />
+              <TextInput
+                className="flex-1 px-2 py-2 text-base"
                 placeholder="Code"
                 value={registerFields.countryCode?.toString() ?? ''}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   if (text === '') {
                     updateField('countryCode', null);
                   } else {
@@ -176,17 +189,18 @@ export default function Register() {
                     updateField('countryCode', isNaN(num) ? null : num);
                   }
                 }}
-                icon={Plus}
                 keyboardType="numeric"
               />
             </View>
 
             {/* Phone Number */}
-            <View className="flex-[2]">
-              <GroupedInputItem
+            <View className="flex-[2] flex-row items-center rounded-md border border-input px-3">
+              <Phone size={20} color={muted} />
+              <TextInput
+                className="flex-1 px-2 py-2 text-base"
                 placeholder="Phone"
                 value={registerFields.mobileNumber?.toString() ?? ''}
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                   if (text === '') {
                     updateField('mobileNumber', null);
                   } else {
@@ -198,14 +212,12 @@ export default function Register() {
                     }
                   }
                 }}
-                icon={Phone}
                 keyboardType="numeric"
               />
             </View>
           </View>
-      </GroupedInput>
-
-
+        </View>
+      </View>
 
       <Button
         onPress={handleRegister}

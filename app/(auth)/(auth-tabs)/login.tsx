@@ -1,18 +1,9 @@
 
 import apiService from '@/lib/api';
-import {
-  User,
-  Mail,
-  Lock,
-  Phone,
-  Eye,
-  EyeOff,
-  Plus,
-} from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { GroupedInput, GroupedInputItem } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { View, Pressable, LogBox, Alert } from 'react-native';
+import { View, Pressable, LogBox, Alert, Text, TextInput } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
@@ -77,23 +68,30 @@ export default function Login() {
 
   return (
     <View className="flex-1 gap-6 my-6 mx-4">
-      <GroupedInput title="Login">
-        <GroupedInputItem
-          placeholder="Email"
-          value={loginFields.email}
-          onChangeText={(text) => updateField('email', text)}
-          icon={Mail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          spellCheck={false}
-        />
-        <GroupedInputItem
-          placeholder="Password"
-          value={loginFields.password}
-          onChangeText={(text) => updateField('password', text)}
-          icon={Lock}
-          secureTextEntry={!showPassword}
-          rightComponent={
+      <View className="rounded-xl border border-input bg-background p-4">
+        <Text className="mb-2 text-xl font-semibold">Login</Text>
+        <View className="gap-4">
+          <View className="flex-row items-center rounded-md border border-input px-3">
+            <Mail size={20} color={muted} />
+            <TextInput
+              className="flex-1 px-2 py-2 text-base"
+              placeholder="Email"
+              value={loginFields.email}
+              onChangeText={(text: string) => updateField('email', text)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              spellCheck={false}
+            />
+          </View>
+          <View className="flex-row items-center rounded-md border border-input px-3">
+            <Lock size={20} color={muted} />
+            <TextInput
+              className="flex-1 px-2 py-2 text-base"
+              placeholder="Password"
+              value={loginFields.password}
+              onChangeText={(text: string) => updateField('password', text)}
+              secureTextEntry={!showPassword}
+            />
             <Pressable onPress={() => setShowPassword(!showPassword)}>
               {showPassword ? (
                 <EyeOff size={22} color={muted} />
@@ -101,9 +99,9 @@ export default function Login() {
                 <Eye size={22} color={muted} />
               )}
             </Pressable>
-          }
-        />
-      </GroupedInput>
+          </View>
+        </View>
+      </View>
 
       <Button
         onPress={handleLogin}

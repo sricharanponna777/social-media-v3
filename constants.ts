@@ -1,4 +1,7 @@
-import { PickerOption } from "./components/ui/picker";
+export type PickerOption = {
+  label: string;
+  value: string;
+};
 
 export const API_URL: string = "http://192.168.1.233:5001";
 export const CountryCodeOptions: PickerOption[] = [
