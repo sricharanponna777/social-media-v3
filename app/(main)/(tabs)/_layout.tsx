@@ -1,12 +1,11 @@
 import { Tabs, useRouter } from 'expo-router'
 import React from 'react'
 import { useColorScheme } from '@/hooks/useColorScheme'
-import { View } from '@/components/ui/view'
-import { TouchableOpacity } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { Icon } from '@/components/ui/icon'
 import { AlignJustify, Bell, Ellipsis, Home, LogOut, MessageCircle, Pencil, Plus, Search, Settings, User, Users, Video } from 'lucide-react-native'
 import { Text } from '@/components/ui/text'
-import { TabsContent, TabsList, TabsTrigger, Tabs as TabsComponent } from '@/components/ui/tabs'
+import { TabsList, TabsTrigger, Tabs as TabsComponent } from '@/components/ui/tabs'
 import { useAuth } from '@/contexts/AuthContext'
 
 const TabLayout = () => {
@@ -22,30 +21,30 @@ const TabLayout = () => {
     }}
     >
         <Tabs.Screen name="feed/index" options={{ tabBarLabel: 'Feed', headerTitle: '', headerTransparent: true, headerLeft: () => (
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity className="p-2.5">
             <Text>Home</Text>
           </TouchableOpacity>
         ), tabBarIcon: ({ color, size }) => (
           <Icon name={Home} size={size} color={color} />
         ), headerRight: () => (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <TouchableOpacity style={{ padding: 10 }} onPress={() => router.push('/(main)/(create)/post')}>
+        <View className="flex-row items-center gap-3">
+          <TouchableOpacity className="p-2.5" onPress={() => router.push('/(main)/(create)/post')}>
             <Icon name={Plus} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
           </TouchableOpacity>
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity className="p-2.5">
             <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
           </TouchableOpacity>
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity className="p-2.5">
             <Icon name={MessageCircle} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
           </TouchableOpacity>
         </View>
       )}} />
         <Tabs.Screen name="friends/index" options={{ tabBarLabel: 'Friends', headerTitle: '', headerTransparent: true, headerLeft: () => (
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity className="p-2.5">
             <Text>Friends</Text>
           </TouchableOpacity>
         ), headerRight: () => (
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity className="p-2.5">
             <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
           </TouchableOpacity>
         ), tabBarIcon: ({ color, size }) => (
@@ -60,25 +59,25 @@ const TabLayout = () => {
           </TabsComponent>
         ), headerRight: () => (
           <>
-            <TouchableOpacity style={{ padding: 10 }}>
-              <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ padding: 10 }}>
-              <Icon name={User} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-            </TouchableOpacity>
+              <TouchableOpacity className="p-2.5">
+                <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+              </TouchableOpacity>
+              <TouchableOpacity className="p-2.5">
+                <Icon name={User} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+              </TouchableOpacity>
           </>
         ), tabBarIcon: ({ color, size }) => (
           <Icon name={Video} size={size} color={color} />
         )}} />
         <Tabs.Screen name="profile/index" options={{ tabBarLabel: 'Profile', headerTransparent: true, headerTitle: '', headerRight: () => (
           <>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity className="p-2.5">
               <Icon name={Pencil} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity className="p-2.5">
               <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity className="p-2.5">
               <Icon name={LogOut} size={24} onPress={async () => {
                 removeToken()
                 router.replace('/')
@@ -89,15 +88,15 @@ const TabLayout = () => {
           <Icon name={User} size={size} color={color} />
         )}} />
         <Tabs.Screen name="notifications/index" options={{ tabBarLabel: 'Activity', headerTitle: '', headerTransparent: true, headerLeft: () => ( 
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity className="p-2.5">
             <Text>Notifications</Text>
           </TouchableOpacity>
         ), headerRight: () => (
           <>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity className="p-2.5">
               <Icon name={Ellipsis} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity className="p-2.5">
               <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
           </>
@@ -105,15 +104,15 @@ const TabLayout = () => {
           <Icon name={Bell} size={size} color={color} />
         )}} />
         <Tabs.Screen name="menu/index" options={{ tabBarLabel: 'Menu', headerTitle: '', headerTransparent: true, headerLeft: () => (
-          <TouchableOpacity style={{ padding: 10 }}>
+          <TouchableOpacity className="p-2.5">
             <Text>Menu</Text>
           </TouchableOpacity>
         ), headerRight: () => (
           <>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity className="p-2.5">
               <Icon name={Settings} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity className="p-2.5">
               <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
           </>
