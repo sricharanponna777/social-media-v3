@@ -11,14 +11,11 @@ import {
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/input';
-import { View } from '@/components/ui/view';
 import { Button } from '@/components/ui/button';
-import { Pressable, LogBox } from 'react-native';
+import { View, Pressable, LogBox, Alert } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
-import { useToast } from '@/components/ui/toast';
-import { useAuth } from '@/contexts/AuthContext';
 
 let colorScheme1;
 
@@ -31,19 +28,6 @@ export default function Login() {
   const colorScheme = useColorScheme();
   colorScheme1 = colorScheme;
   const router = useRouter();
-  const { success, error } = useToast();
-  const loginSuccessToast = () => {
-    success(
-      'Login Successful'
-    );
-  };
-
-  const loginErrorToast = (err: string) => {
-    error(
-      'Login Error',
-      err
-    );
-  };
   LogBox.ignoreAllLogs();
   const [loginFields, setLoginFields] = useState<LoginFields>({
     email: '',
@@ -78,11 +62,11 @@ export default function Login() {
         password,
       });
       console.log('Login response:', response);
-      loginSuccessToast();
+      Alert.alert('Login Successful');
       router.replace('/feed');
     } catch (error: string | any) {
       console.error('Login error:', error);
-      loginErrorToast(error)
+      Alert.alert('Login Error', error);
     } finally {
       setLoginFields({
         email: '',
@@ -92,9 +76,9 @@ export default function Login() {
   };
 
   return (
-    <View style={{ gap: 24, flex: 1, marginVertical: 24, marginHorizontal: 16 }}>
+    <View className="flex-1 gap-6 my-6 mx-4">
       <GroupedInput title="Login">
-      <GroupedInputItem
+        <GroupedInputItem
           placeholder="Email"
           value={loginFields.email}
           onChangeText={(text) => updateField('email', text)}
@@ -102,32 +86,30 @@ export default function Login() {
           keyboardType="email-address"
           autoCapitalize="none"
           spellCheck={false}
-      />
-      <GroupedInputItem
+        />
+        <GroupedInputItem
           placeholder="Password"
           value={loginFields.password}
           onChangeText={(text) => updateField('password', text)}
           icon={Lock}
           secureTextEntry={!showPassword}
           rightComponent={
-          <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
               {showPassword ? (
-              <EyeOff size={22} color={muted} />
+                <EyeOff size={22} color={muted} />
               ) : (
-              <Eye size={22} color={muted} />
+                <Eye size={22} color={muted} />
               )}
-          </Pressable>
+            </Pressable>
           }
-      />
+        />
       </GroupedInput>
-
-
 
       <Button
         onPress={handleLogin}
         disabled={!isFormValid}
+        className="mt-6"
         style={{
-          marginTop: 24,
           backgroundColor: isFormValid ? (colorScheme1 === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)') : '#ccc',
         }}
       >

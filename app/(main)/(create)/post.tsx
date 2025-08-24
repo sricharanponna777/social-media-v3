@@ -4,15 +4,13 @@ import {
   Image,
   Linking,
   Platform,
-  Text
+  Text,
+  View
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
-
-import { View } from '@/components/ui/view'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { ActionSheet } from '@/components/ui/action-sheet'
 import apiService, { Visibility } from '@/lib/api'
 import { useRouter } from 'expo-router'
 
@@ -22,7 +20,6 @@ export default function CreatePost() {
   const [caption, setCaption] = useState('')
   const [loading, setLoading] = useState(false)
   const [media, setMedia] = useState<any[]>([])
-  const [isVisible, setIsVisible] = useState(false)
   const [createPostDisabled, setCreatePostDisabled] = useState(false)
   const [mediaUrls, setMediaUrls] = useState<string[]>([])
 
@@ -193,10 +190,29 @@ export default function CreatePost() {
       <Text className="text-2xl font-bold text-black dark:text-white">Create Post</Text>
 
       {/* Media Picker */}
-      <View>
-        <Button onPress={() => setIsVisible(true)} className="w-full h-12">
-          Add Media
-        </Button>
+        <View>
+          <Button
+            onPress={() =>
+              Alert.alert(
+                'Choose an action',
+                'Select one of the options below',
+                [
+                  {
+                    text: 'Select Photos/Videos',
+                    onPress: handlePickMedia,
+                  },
+                  {
+                    text: 'Take Photos/Videos',
+                    onPress: handleTakeMedia,
+                  },
+                  { text: 'Cancel', style: 'cancel' },
+                ],
+              )
+            }
+            className="w-full h-12"
+          >
+            Add Media
+          </Button>
 
         {/* Media Preview */}
         {media.length > 0 && (
@@ -221,29 +237,6 @@ export default function CreatePost() {
             </Button>
           </>
         )}
-
-        <ActionSheet
-          visible={isVisible}
-          onClose={() => setIsVisible(false)}
-          title="Choose an action"
-          message="Select one of the options below"
-          options={[
-            {
-              title: 'Select Photos/Videos',
-              onPress: () => {
-                handlePickMedia()
-                setIsVisible(false)
-              },
-            },
-            {
-              title: 'Take Photos/Videos',
-              onPress: () => {
-                handleTakeMedia()
-                setIsVisible(false)
-              },
-            },
-          ]}
-        />
       </View>
 
       {/* Caption Input */}

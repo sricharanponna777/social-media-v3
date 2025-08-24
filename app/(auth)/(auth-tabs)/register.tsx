@@ -10,14 +10,12 @@ import {
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/input';
-import { View } from '@/components/ui/view';
 import { Button } from '@/components/ui/button';
-import { Pressable, LogBox } from 'react-native';
+import { View, Pressable, LogBox, Alert } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useToast } from '@/components/ui/toast';
 
 let colorScheme1;
 interface RegisterFields {
@@ -34,20 +32,6 @@ export default function Register() {
   const colorScheme = useColorScheme();
   colorScheme1 = colorScheme;
   const router = useRouter();
-  const { success, error } = useToast();
-  const registrationSuccessToast = () => {
-    success(
-      'Registration Successful',
-      'Please check your email and phone to verify your account'
-    );
-  };
-
-  const registrationErrorToast = () => {
-    error(
-      'Registration Error', 
-      'Please try again later'
-    );
-  };
   LogBox.ignoreAllLogs();
   const [registerFields, setRegisterFields] = useState<RegisterFields>({
     username: '',
@@ -94,16 +78,16 @@ export default function Register() {
         firstName,
         lastName,
         countryCode: countryCode as number,
-        mobileNumber: mobileNumber?.toString() ?? '', 
+        mobileNumber: mobileNumber?.toString() ?? '',
       });
       console.log('Register response:', response);
       await AsyncStorage.setItem('otp', response.otp);
       await AsyncStorage.setItem('email', response.user.email);
       await AsyncStorage.setItem('phone', response.user.mobile_number);
-      registrationSuccessToast();
+      Alert.alert('Registration Successful', 'Please check your email and phone to verify your account');
     } catch (error) {
       console.error('Register error:', error);
-      registrationErrorToast();
+      Alert.alert('Registration Error', 'Please try again later');
     } finally {
       setRegisterFields({
         username: '',
@@ -119,11 +103,11 @@ export default function Register() {
   };
 
   return (
-    <View style={{ gap: 24, flex: 1, marginVertical: 24, marginHorizontal: 16 }}>
+    <View className="flex-1 gap-6 my-6 mx-4">
       <GroupedInput title="Register">
         {/* First Name and Last Name in one row */}
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          <View style={{ flex: 1 }}>
+        <View className="flex-row gap-3">
+          <View className="flex-1">
           <GroupedInputItem
               placeholder="First Name"
               value={registerFields.firstName}
@@ -132,7 +116,7 @@ export default function Register() {
               keyboardType="default"
           />
           </View>
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
           <GroupedInputItem
               placeholder="Last Name"
               value={registerFields.lastName}
@@ -178,9 +162,9 @@ export default function Register() {
           </Pressable>
           }
       />
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View className="flex-row gap-3">
             {/* Country Code */}
-            <View style={{ flex: 0.7 }}>
+            <View className="flex-[0.7]">
               <GroupedInputItem
                 placeholder="Code"
                 value={registerFields.countryCode?.toString() ?? ''}
@@ -198,7 +182,7 @@ export default function Register() {
             </View>
 
             {/* Phone Number */}
-            <View style={{ flex: 2 }}>
+            <View className="flex-[2]">
               <GroupedInputItem
                 placeholder="Phone"
                 value={registerFields.mobileNumber?.toString() ?? ''}
@@ -226,8 +210,8 @@ export default function Register() {
       <Button
         onPress={handleRegister}
         disabled={!isFormValid}
+        className="mt-6"
         style={{
-          marginTop: 24,
           backgroundColor: isFormValid ? (colorScheme1 === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)') : '#ccc',
         }}
       >

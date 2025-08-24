@@ -1,9 +1,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { Icon } from './ui/icon';
 import { Text } from './ui/text';
-import { View } from './ui/view';
 
 type PaginationProps = {
   currentPage: number;

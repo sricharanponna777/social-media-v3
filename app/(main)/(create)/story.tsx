@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Text, TextInput } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { View } from '@/components/ui/view';
 import { Button } from '@/components/ui/button';
-import { Image } from '@/components/ui/image';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import apiService from '@/lib/api';
 

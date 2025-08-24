@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Text, View, Button } from 'react-native';
-import { useToast } from '@/components/ui/toast';
+import { Alert, FlatList, Text, View, Button } from 'react-native';
 import apiService from '@/lib/api';
 import { useSocket } from '@/contexts/SocketContext';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -31,7 +30,6 @@ const FriendsScreen = () => {
     onFriendBlocked,
     isConnected,
   } = useSocket();
-  const toast = useToast();
 
   // --- Pulse animation setup ---
   const scale = useSharedValue(1);
@@ -72,37 +70,36 @@ const FriendsScreen = () => {
 
   // --- Socket listeners ---
   useEffect(() => {
-    const offRequest = onFriendRequest((data) => {
-      toast.info('New friend request', `${data.username} sent you a request`);
-      setRequests((prev) => [data, ...prev]);
-    });
-    const offAccepted = onFriendRequestAccepted((data) =>
-      toast.success('Request accepted', `${data.username} accepted your request`)
-    );
-    const offRejected = onFriendRequestRejected((data) =>
-      toast.info('Request rejected', `${data.username} rejected your request`)
-    );
-    const offRemoved = onFriendRemoved((data) =>
-      toast.info('Friend removed', `${data.username} removed you`)
-    );
-    const offBlocked = onFriendBlocked((data) =>
-      toast.error('Blocked', `${data.username} blocked you`)
-    );
+      const offRequest = onFriendRequest((data) => {
+        Alert.alert('New friend request', `${data.username} sent you a request`)
+        setRequests((prev) => [data, ...prev])
+      })
+      const offAccepted = onFriendRequestAccepted((data) =>
+        Alert.alert('Request accepted', `${data.username} accepted your request`)
+      )
+      const offRejected = onFriendRequestRejected((data) =>
+        Alert.alert('Request rejected', `${data.username} rejected your request`)
+      )
+      const offRemoved = onFriendRemoved((data) =>
+        Alert.alert('Friend removed', `${data.username} removed you`)
+      )
+      const offBlocked = onFriendBlocked((data) =>
+        Alert.alert('Blocked', `${data.username} blocked you`)
+      )
     return () => {
       offRequest();
       offAccepted();
       offRejected();
       offRemoved();
-      offBlocked();
-    };
+      offBlocked()
+    }
   }, [
     onFriendRequest,
     onFriendRequestAccepted,
     onFriendRequestRejected,
     onFriendRemoved,
     onFriendBlocked,
-    toast,
-  ]);
+  ])
 
   // --- Handle accept/reject ---
   const handleAccept = async (id: string) => {

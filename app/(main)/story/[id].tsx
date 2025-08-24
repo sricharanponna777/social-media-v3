@@ -8,14 +8,11 @@ import {
   Pressable,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Video } from '@/components/ui/video'
 import { Icon } from '@/components/ui/icon'
 import { ArrowLeft } from 'lucide-react-native'
 import apiService from '@/lib/api'
 import { API_URL } from '@/constants'
 import { Image } from 'expo-image'
-import { runOnJS, useSharedValue } from 'react-native-reanimated'
-import { Gesture } from 'react-native-gesture-handler'
 
 interface Story {
   id: string
@@ -101,24 +98,6 @@ export default function StoryView() {
     }
   }
 
-  const translateX = useSharedValue(0)
-
-  const panGesture = Gesture.Pan()
-    .onBegin(() => {
-      runOnJS(pauseProgress)()
-    })
-    .onUpdate((e) => {
-      translateX.value = e.translationX
-    })
-    .onEnd((e) => {
-      if (e.translationX < -50) {
-        runOnJS(handlePrevious)()
-      } else if (e.translationX > 50) {
-        runOnJS(handleNext)()
-      }
-      translateX.value = 0
-      runOnJS(resumeProgress)()
-    })
 
   const resumeProgress = () => {
     if (isPaused.current && story) {
@@ -174,16 +153,14 @@ export default function StoryView() {
         onPressOut={resumeProgress}
       >
         {story.media_type === 'video' ? (
-          <Video
-            source={{ uri: `${API_URL}${story.media_url}` }}
-            className="w-full h-full"
-            autoPlay
-          />
+          <View className="items-center justify-center w-full h-full">
+            <Text className="text-white">Video not supported</Text>
+          </View>
         ) : (
           <View className="w-full h-full">
             <Image
               source={{ uri: `${API_URL}${story.media_url}` }}
-              style={{ flex: 1 }}   // instead of className
+              style={{ flex: 1 }}
               contentFit="contain"
             />
           </View>

@@ -1,6 +1,6 @@
-import { InputOTP } from "@/components/ui/input-otp";
 import React, { useState } from "react";
-import { View } from "@/components/ui/view";
+import { View, TextInput } from "react-native";
+import { Text } from "@/components/ui/text";
 import apiService from "@/lib/api";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,6 +18,7 @@ export default function VerifyOTP() {
   });
   const [otp, setOtp] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const router = useRouter()
   
   const handleVerify = async (otp: string) => {
     try {
@@ -27,12 +28,11 @@ export default function VerifyOTP() {
       });
       console.log('Verify response:', response);
       await AsyncStorage.removeItem('otp');
-      await AsyncStorage.removeItem('email');
-      await AsyncStorage.removeItem('phone')
-      const authToken = response.token;
-      console.log('Token:', authToken);
-      const router = useRouter()
-      router.replace('/(main)/(tabs)/feed');
+        await AsyncStorage.removeItem('email');
+        await AsyncStorage.removeItem('phone')
+        const authToken = response.token;
+        console.log('Token:', authToken);
+        router.replace('/(main)/(tabs)/feed');
     } catch (errorr: any) {
       if (errorr.response?.status === 401) {
         console.log('OTP is invalid');
@@ -44,16 +44,18 @@ export default function VerifyOTP() {
   } 
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <InputOTP
-        length={6}
+    <View className="flex-1 items-center justify-center">
+      <TextInput
+        className="w-40 p-2 text-lg text-center border border-gray-300 rounded-lg"
+        keyboardType="number-pad"
+        maxLength={6}
         value={otp}
-        onChangeText={setOtp}
-        onComplete={(value) => {
-          handleVerify(value);
+        onChangeText={(value) => {
+          setOtp(value);
+          if (value.length === 6) handleVerify(value);
         }}
-        error={error}
       />
+      {error ? <Text className="mt-2 text-red-500">{error}</Text> : null}
     </View>
   )
 }

@@ -1,18 +1,21 @@
 
-import React, { SyntheticEvent, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { View } from './ui/view';
 import { Text } from './ui/text';
-import { Image } from './ui/image';
-import { API_URL } from '@/constants';
-import { Carousel, CarouselItem } from './ui/carousel';
-import { BORDER_RADIUS } from '@/theme/globals';
-import _ from 'lodash'
 import { Icon } from './ui/icon';
 import { Flag, MessageCircle, Share, ThumbsUp } from 'lucide-react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { TouchableOpacity, Share as ShareAPI, NativeSyntheticEvent, TextLayoutEventData } from 'react-native';
-import { Video } from './ui/video';
+import {
+  TouchableOpacity,
+  ScrollView,
+  View,
+  NativeSyntheticEvent,
+  TextLayoutEventData,
+} from 'react-native';
+import { Image } from 'expo-image';
+import { API_URL } from '@/constants';
+import { BORDER_RADIUS } from '@/theme/globals';
+import _ from 'lodash';
 
 export interface Post {
   id: string;
@@ -57,13 +60,13 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const handleShare = async () => {
     setSharing(true)
 };
-  const images = _.map(post.media_urls, str => ({ uri: str, caption: post.content }))
-  const longPressGesture = Gesture.LongPress().onEnd((e, success) => {
-    if (success) {
-      console.log(`Long pressed for ${e.duration} ms!`);
-      // Open Reaction Bar
-    }
-  });
+    const images = _.map(post.media_urls, (str) => ({ uri: str, caption: post.content }))
+    const longPressGesture = Gesture.LongPress().onEnd((e, success) => {
+      if (success) {
+        console.log(`Long pressed for ${e.duration} ms!`)
+        // Open Reaction Bar
+      }
+    })
 
   const onTextLayout = useCallback((e: NativeSyntheticEvent<TextLayoutEventData>) => {
     const { lines } = e.nativeEvent;
@@ -72,68 +75,66 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   }, [post.content])
 
   return (
-    <Card style={{ marginVertical: 10 }}>
-      <CardHeader>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ marginLeft: 10 }}>Posted By {post.full_name}</Text>
-        </View>
-      </CardHeader>
-      <CardContent>
-        <Carousel autoPlay autoPlayInterval={2000} loop style={{ height: images.length ? 240 : sizeOfTextBox, borderRadius: BORDER_RADIUS }}>
-          {images.map((image, index) => (
-            <CarouselItem key={index} style={{ padding: 0 }}>
-              <View style={{ position: 'relative' }}>
-                {getMediaType(image.uri) === 'image' ? (
-                  <Image
-                    source={{ uri: `${API_URL}${image.uri}` }}
-                    style={{
-                      width: '100%',
-                      height: 240,
-                      borderRadius: BORDER_RADIUS,
-                    }}
-                    contentFit='cover'
-                  />
-                ) : getMediaType(image.uri) === 'video' ? (
-                  <Video
-                    source={{ uri: `${API_URL}${image.uri}` }}
-                    style={{
-                      width: '100%',
-                      height: 240,
-                      borderRadius: BORDER_RADIUS,
-                    }}
-                    contentFit='cover'
-                    nativeControls
-                  />
-                ) : (
-                  <View>
-                    <Text>{post.content}</Text>
-                  </View>
-                )}
+      <Card className="my-2.5">
+        <CardHeader>
+          <View className="flex-row items-center">
+            <Text className="ml-2.5">Posted By {post.full_name}</Text>
+          </View>
+        </CardHeader>
+        <CardContent>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            style={{ height: images.length ? 240 : sizeOfTextBox, borderRadius: BORDER_RADIUS }}
+          >
+            {images.map((image, index) => (
+              <View key={index} style={{ padding: 0, width: '100%' }}>
+                <View className="relative">
+                  {getMediaType(image.uri) === 'image' ? (
+                    <Image
+                      source={{ uri: `${API_URL}${image.uri}` }}
+                      style={{
+                        width: '100%',
+                        height: 240,
+                        borderRadius: BORDER_RADIUS,
+                      }}
+                      contentFit="cover"
+                    />
+                  ) : getMediaType(image.uri) === 'video' ? (
+                    <Text>Video not supported</Text>
+                  ) : (
+                    <View>
+                      <Text>{post.content}</Text>
+                    </View>
+                  )}
+                </View>
               </View>
-          </CarouselItem>
-        ))}
-      </Carousel>
-        <Text style={{ marginTop: 10 }} onTextLayout={onTextLayout}>{post.content}</Text>
-      </CardContent>
-      <CardFooter>
-        <View style={{ columnGap: '25%', flexDirection: 'row', paddingRight: 20 }}>
-          <TouchableOpacity>
-            <GestureDetector gesture={longPressGesture}>
-              <Icon name={ThumbsUp} size={24} />
-            </GestureDetector>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon name={MessageCircle} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleShare}>
-            <Icon name={Share} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon name={Flag} />
-          </TouchableOpacity>
-        </View>
-      </CardFooter>
-    </Card>
+            ))}
+          </ScrollView>
+          <Text className="mt-2.5" onTextLayout={onTextLayout}>
+            {post.content}
+          </Text>
+        </CardContent>
+        <CardFooter>
+          <View className="flex-row justify-between pr-5">
+            <TouchableOpacity>
+              <GestureDetector gesture={longPressGesture}>
+                <Icon name={ThumbsUp} size={24} />
+              </GestureDetector>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Icon name={MessageCircle} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleShare}>
+              <Icon name={Share} />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Icon name={Flag} />
+            </TouchableOpacity>
+          </View>
+        </CardFooter>
+      </Card>
   );
 };
 
