@@ -4,7 +4,6 @@ import {
   Image,
   Linking,
   Platform,
-  Text,
   View
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
@@ -13,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import apiService, { Visibility } from '@/lib/api'
 import { useRouter } from 'expo-router'
+import { Text } from '@/components/ui/text'
 
 export default function CreatePost() {
   const router = useRouter();
@@ -211,7 +211,7 @@ export default function CreatePost() {
             }
             className="w-full h-12"
           >
-            Add Media
+            <Text>Add Media</Text>
           </Button>
 
         {/* Media Preview */}
@@ -233,7 +233,7 @@ export default function CreatePost() {
               variant="outline"
               className="w-[333px] h-12 mt-3"
             >
-              Clear Media
+              <Text>Clear Media</Text>
             </Button>
           </>
         )}
@@ -251,11 +251,11 @@ export default function CreatePost() {
       {/* Visibility Tabs */}
       <View className="items-center">
         <Text className="mb-3 text-base font-bold text-black dark:text-white">Visibility</Text>
-        <Tabs defaultValue={tabsValue} onValueChange={setTabsValue}>
-          <TabsList style={{ width: '100%' }}>
-            <TabsTrigger value="public">Public</TabsTrigger>
-            <TabsTrigger value="friends">Friends</TabsTrigger>
-            <TabsTrigger value="private">Private</TabsTrigger>
+        <Tabs value={tabsValue} onValueChange={setTabsValue}>
+          <TabsList>
+            <TabsTrigger value="public"><Text>Public</Text></TabsTrigger>
+            <TabsTrigger value="friends"><Text>Friends</Text></TabsTrigger>
+            <TabsTrigger value="private"><Text>Private</Text></TabsTrigger>
           </TabsList>
         </Tabs>
       </View>
@@ -267,7 +267,7 @@ export default function CreatePost() {
           disabled={createPostDisabled || loading}
           className="w-full h-12"
         >
-          {loading ? 'Posting...' : 'Create Post'}
+          <Text>{loading ? 'Posting...' : 'Create Post'}</Text>
         </Button>
       </View>
     </View>

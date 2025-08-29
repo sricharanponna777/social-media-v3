@@ -143,7 +143,7 @@ export default function StoryView() {
         className="absolute z-10 top-10 left-10"
         onPress={() => router.back()}
       >
-        <Icon name={ArrowLeft} size={24} color="white" />
+        <Icon as={ArrowLeft} size={24} color="white" />
       </TouchableOpacity>
 
       {/* Media with press/hold */}

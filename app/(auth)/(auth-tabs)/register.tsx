@@ -10,11 +10,13 @@ import {
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { View, Pressable, LogBox, Alert, Text, TextInput } from 'react-native';
+import { View, Pressable, LogBox, Alert, TextInput } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Text } from '@/components/ui/text';
+import clsx from 'clsx';
 
 let colorScheme1;
 interface RegisterFields {
@@ -84,6 +86,7 @@ export default function Register() {
       await AsyncStorage.setItem('email', response.user.email);
       await AsyncStorage.setItem('phone', response.user.mobile_number);
       Alert.alert('Registration Successful', 'Please check your email and phone to verify your account');
+      router.replace('/(auth)/verify-otp');
     } catch (error) {
       console.error('Register error:', error);
       Alert.alert('Registration Error', 'Please try again later');
@@ -97,31 +100,31 @@ export default function Register() {
         countryCode: null,
         mobileNumber: null,
       });
-      router.replace('/(auth)/verify-otp');
+      
     }
   };
 
   return (
-    <View className="flex-1 gap-6 my-6 mx-4">
-      <View className="rounded-xl border border-input bg-background p-4">
+    <View className="flex-1 gap-6 mx-4 my-6">
+      <View className="p-4 border rounded-xl border-input bg-background">
         <Text className="mb-2 text-xl font-semibold">Register</Text>
         <View className="gap-4">
           {/* First Name and Last Name in one row */}
           <View className="flex-row gap-3">
-            <View className="flex-1 flex-row items-center rounded-md border border-input px-3">
+            <View className="flex-row items-center flex-1 px-3 border rounded-md border-input">
               <User size={20} color={muted} />
               <TextInput
-                className="flex-1 px-2 py-2 text-base"
+                className="flex-1 px-2 py-2 text-base text-foreground"
                 placeholder="First Name"
                 value={registerFields.firstName}
                 onChangeText={(text: string) => updateField('firstName', text)}
                 keyboardType="default"
               />
             </View>
-            <View className="flex-1 flex-row items-center rounded-md border border-input px-3">
+            <View className="flex-row items-center flex-1 px-3 border rounded-md border-input">
               <User size={20} color={muted} />
               <TextInput
-                className="flex-1 px-2 py-2 text-base"
+                className="flex-1 px-2 py-2 text-base text-foreground"
                 placeholder="Last Name"
                 value={registerFields.lastName}
                 onChangeText={(text: string) => updateField('lastName', text)}
@@ -130,10 +133,10 @@ export default function Register() {
             </View>
           </View>
 
-          <View className="flex-row items-center rounded-md border border-input px-3">
+          <View className="flex-row items-center px-3 border rounded-md border-input">
             <User size={20} color={muted} />
             <TextInput
-              className="flex-1 px-2 py-2 text-base"
+              className="flex-1 px-2 py-2 text-base text-foreground"
               placeholder="Username"
               value={registerFields.username}
               onChangeText={(text: string) => updateField('username', text)}
@@ -142,10 +145,10 @@ export default function Register() {
             />
           </View>
 
-          <View className="flex-row items-center rounded-md border border-input px-3">
+          <View className="flex-row items-center px-3 border rounded-md border-input">
             <Mail size={20} color={muted} />
             <TextInput
-              className="flex-1 px-2 py-2 text-base"
+              className="flex-1 px-2 py-2 text-base text-foreground"
               placeholder="Email"
               value={registerFields.email}
               onChangeText={(text: string) => updateField('email', text)}
@@ -155,10 +158,10 @@ export default function Register() {
             />
           </View>
 
-          <View className="flex-row items-center rounded-md border border-input px-3">
+          <View className="flex-row items-center px-3 border rounded-md border-input">
             <Lock size={20} color={muted} />
             <TextInput
-              className="flex-1 px-2 py-2 text-base"
+              className="flex-1 px-2 py-2 text-base text-foreground"
               placeholder="Password"
               value={registerFields.password}
               onChangeText={(text: string) => updateField('password', text)}
@@ -176,18 +179,14 @@ export default function Register() {
           <View className="flex-row gap-3">
             {/* Country Code */}
             <View className="flex-[0.7] flex-row items-center rounded-md border border-input px-3">
-              <Plus size={20} color={muted} />
+              <Text className="mr-1 text-base text-foreground">+</Text>
               <TextInput
-                className="flex-1 px-2 py-2 text-base"
+                className="flex-1 px-1 py-2 text-base text-foreground"
                 placeholder="Code"
                 value={registerFields.countryCode?.toString() ?? ''}
                 onChangeText={(text: string) => {
-                  if (text === '') {
-                    updateField('countryCode', null);
-                  } else {
-                    const num = parseInt(text);
-                    updateField('countryCode', isNaN(num) ? null : num);
-                  }
+                  const num = parseInt(text);
+                  updateField('countryCode', isNaN(num) ? null : num);
                 }}
                 keyboardType="numeric"
               />
@@ -197,7 +196,7 @@ export default function Register() {
             <View className="flex-[2] flex-row items-center rounded-md border border-input px-3">
               <Phone size={20} color={muted} />
               <TextInput
-                className="flex-1 px-2 py-2 text-base"
+                className="flex-1 px-2 py-2 text-base text-foreground"
                 placeholder="Phone"
                 value={registerFields.mobileNumber?.toString() ?? ''}
                 onChangeText={(text: string) => {
@@ -222,12 +221,15 @@ export default function Register() {
       <Button
         onPress={handleRegister}
         disabled={!isFormValid}
-        className="mt-6"
+        className={clsx("mt-6", {
+          "bg-green-400 dark:bg-green-600": isFormValid,
+          "bg-gray-200 dark:bg-gray-600": !isFormValid,
+        })}
         style={{
           backgroundColor: isFormValid ? (colorScheme1 === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)') : '#ccc',
         }}
       >
-        Register
+        <Text>Register</Text>
       </Button>
     </View>
   );

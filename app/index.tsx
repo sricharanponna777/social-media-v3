@@ -31,7 +31,7 @@ export default function WelcomeScreen() {
         className="bg-green-500 dark:bg-green-600 rounded-[12.5%] mt-5"
         variant={'ghost'}
       >
-        Login
+        <Text>Login</Text>
       </Button>
       <Button
         onPress={() => router.replace('/register')} //
@@ -39,7 +39,7 @@ export default function WelcomeScreen() {
         className="bg-green-500 dark:bg-green-600 rounded-[12.5%] mt-5"
         variant={'ghost'}
       >
-        Register
+        <Text>Register</Text>
       </Button>
     </View>
   );

@@ -3,12 +3,12 @@ import apiService from '@/lib/api';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { View, Pressable, LogBox, Alert, Text, TextInput } from 'react-native';
+import { View, Pressable, LogBox, Alert, TextInput } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
-
-let colorScheme1;
+import { Text } from '@/components/ui/text';
+import clsx from 'clsx';
 
 interface LoginFields {
   email: string;
@@ -16,8 +16,6 @@ interface LoginFields {
 }
 
 export default function Login() {
-  const colorScheme = useColorScheme();
-  colorScheme1 = colorScheme;
   const router = useRouter();
   LogBox.ignoreAllLogs();
   const [loginFields, setLoginFields] = useState<LoginFields>({
@@ -67,14 +65,14 @@ export default function Login() {
   };
 
   return (
-    <View className="flex-1 gap-6 my-6 mx-4">
-      <View className="rounded-xl border border-input bg-background p-4">
+    <View className="flex-1 gap-6 mx-4 my-6">
+      <View className="p-4 border rounded-xl border-input bg-background">
         <Text className="mb-2 text-xl font-semibold">Login</Text>
         <View className="gap-4">
-          <View className="flex-row items-center rounded-md border border-input px-3">
+          <View className="flex-row items-center px-3 border rounded-md border-input">
             <Mail size={20} color={muted} />
             <TextInput
-              className="flex-1 px-2 py-2 text-base"
+              className="flex-1 h-12 px-2 py-2 text-base text-foreground"
               placeholder="Email"
               value={loginFields.email}
               onChangeText={(text: string) => updateField('email', text)}
@@ -83,10 +81,10 @@ export default function Login() {
               spellCheck={false}
             />
           </View>
-          <View className="flex-row items-center rounded-md border border-input px-3">
+          <View className="flex-row items-center px-3 border rounded-md border-input">
             <Lock size={20} color={muted} />
             <TextInput
-              className="flex-1 px-2 py-2 text-base"
+              className="flex-1 h-12 px-2 py-2 text-base text-foreground"
               placeholder="Password"
               value={loginFields.password}
               onChangeText={(text: string) => updateField('password', text)}
@@ -106,12 +104,9 @@ export default function Login() {
       <Button
         onPress={handleLogin}
         disabled={!isFormValid}
-        className="mt-6"
-        style={{
-          backgroundColor: isFormValid ? (colorScheme1 === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)') : '#ccc',
-        }}
+        className={clsx('mt-6', { 'bg-zinc-500': !isFormValid, 'bg-green-400 dark:bg-green-600': isFormValid })}
       >
-        Login
+        <Text>Login</Text>
       </Button>
     </View>
   );

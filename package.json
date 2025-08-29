@@ -46,6 +46,7 @@
     "@shopify/flash-list": "^2.0.3",
     "@tailwindcss/cli": "^4.1.12",
     "@tailwindcss/postcss": "^4.1.12",
+    "@tamagui/config": "^1.132.23",
     "autoprefixer": "^10.4.21",
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
@@ -96,6 +97,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "tailwindcss-react-native": "^1.7.10",
+    "tamagui": "^1.132.23",
     "uuid": "^11.1.0",
     "yup": "^1.7.0"
   },

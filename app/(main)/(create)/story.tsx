@@ -64,7 +64,7 @@ export default function CreateStoryScreen() {
     <View className='flex-1 gap-5 px-6 py-12'>
       <Text className='text-2xl font-bold text-black dark:text-white'>Create Story</Text>
       {!captionInputFocused && (
-        <Button onPress={pickMedia}>Pick Image or Video</Button>
+        <Button onPress={pickMedia}><Text>Pick Image or Video</Text></Button>
       )}
       {/* Use a more robust check for media object before trying to access its properties */}
       {(!captionInputFocused && media) && (
@@ -95,7 +95,7 @@ export default function CreateStoryScreen() {
         onPress={createStory}
         disabled={uploading}
       >
-        {uploading ? 'Uploading...' : 'Create Story'}
+        <Text>{uploading ? 'Uploading...' : 'Create Story'}</Text>
       </Button>
     </View>
   );

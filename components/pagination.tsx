@@ -56,7 +56,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         onPress={() => onPageChange(currentPage - 1)}
       >
-        <Icon name={ChevronLeft} className="text-foreground" />
+        <Icon as={ChevronLeft} className="text-foreground" />
       </TouchableOpacity>
 
       {/* Page Numbers */}
@@ -95,7 +95,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages}
         onPress={() => onPageChange(currentPage + 1)}
       >
-        <Icon name={ChevronRight} className="text-foreground" />
+        <Icon as={ChevronRight} className="text-foreground" />
       </TouchableOpacity>
     </View>
   );

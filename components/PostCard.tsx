@@ -11,11 +11,13 @@ import {
   View,
   NativeSyntheticEvent,
   TextLayoutEventData,
+  FlatList,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { API_URL } from '@/constants';
 import { BORDER_RADIUS } from '@/theme/globals';
 import _ from 'lodash';
+import Carousel from './ui/carousel';
 
 export interface Post {
   id: string;
@@ -34,6 +36,8 @@ interface PostCardProps {
 function getMediaType(fileNameOrMime: string): "video" | "image" | "unknown" {
   // Normalise input
   const input = fileNameOrMime.toLowerCase().trim();
+
+  console.log(`${API_URL}${input}`)
 
   // Common MIME type checks
   if (input.startsWith("image/")) return "image";
@@ -61,6 +65,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     setSharing(true)
 };
     const images = _.map(post.media_urls, (str) => ({ uri: str, caption: post.content }))
+    console.log(JSON.stringify(images))
     const longPressGesture = Gesture.LongPress().onEnd((e, success) => {
       if (success) {
         console.log(`Long pressed for ${e.duration} ms!`)
@@ -82,55 +87,39 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           </View>
         </CardHeader>
         <CardContent>
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            style={{ height: images.length ? 240 : sizeOfTextBox, borderRadius: BORDER_RADIUS }}
-          >
-            {images.map((image, index) => (
-              <View key={index} style={{ padding: 0, width: '100%' }}>
-                <View className="relative">
-                  {getMediaType(image.uri) === 'image' ? (
-                    <Image
-                      source={{ uri: `${API_URL}${image.uri}` }}
-                      style={{
-                        width: '100%',
-                        height: 240,
-                        borderRadius: BORDER_RADIUS,
-                      }}
-                      contentFit="cover"
-                    />
-                  ) : getMediaType(image.uri) === 'video' ? (
-                    <Text>Video not supported</Text>
-                  ) : (
-                    <View>
-                      <Text>{post.content}</Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-            ))}
-          </ScrollView>
+          <Carousel
+            data={images}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: `${API_URL}${item.uri}` }}
+                style={{
+                  width: '87%',
+                  height: 240,
+                  borderRadius: BORDER_RADIUS,
+                }}
+                contentFit='cover'
+              />
+            )}
+          />
           <Text className="mt-2.5" onTextLayout={onTextLayout}>
             {post.content}
           </Text>
         </CardContent>
         <CardFooter>
-          <View className="flex-row justify-between pr-5">
+          <View className="flex-row gap-20 pr-5">
             <TouchableOpacity>
               <GestureDetector gesture={longPressGesture}>
-                <Icon name={ThumbsUp} size={24} />
+                <Icon as={ThumbsUp} size={24} />
               </GestureDetector>
             </TouchableOpacity>
             <TouchableOpacity>
-              <Icon name={MessageCircle} />
+              <Icon as={MessageCircle} size={24} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleShare}>
-              <Icon name={Share} />
+              <Icon as={Share} size={24} />
             </TouchableOpacity>
             <TouchableOpacity>
-              <Icon name={Flag} />
+              <Icon as={Flag} size={24} />
             </TouchableOpacity>
           </View>
         </CardFooter>

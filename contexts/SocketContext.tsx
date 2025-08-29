@@ -1,4 +1,5 @@
 // contexts/SocketContext.tsx
+import { API_URL } from '@/constants';
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { io, Socket } from 'socket.io-client';
@@ -6,8 +7,7 @@ import { io, Socket } from 'socket.io-client';
 type FriendRequest = {
   id: string;
   user_id: string;
-  username: string;
-  display_name: string;
+  friend_username: string;
   avatar_url: string | null;
   created_at: string;
 };
@@ -15,8 +15,7 @@ type FriendRequest = {
 type FriendEvent = {
   id: string;
   user_id: string;
-  username: string;
-  display_name: string;
+  friend_username: string;
   avatar_url: string | null;
 };
 
@@ -40,7 +39,7 @@ const SocketContext = createContext<SocketContextType>({
   onFriendBlocked: () => () => {},
 });
 
-const SOCKET_URL = 'http://192.168.1.233:5001'; // Change to your backend IP
+const SOCKET_URL = API_URL; // Change to your backend IP
 
 export const SocketProvider = ({ token, children }: { token: string; children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);

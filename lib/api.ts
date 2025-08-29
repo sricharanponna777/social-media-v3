@@ -97,6 +97,19 @@ class ApiService {
   private api = new Api();
   
   // ---------------------------USER ROUTES---------------------------
+  async searchUsers(query: string) {
+    try {
+      const auth_token = await AsyncStorage.getItem('auth_token');
+      if (!auth_token) {
+        throw new Error('No auth token found');
+      }
+      return this.api.get('api/users/search', { query }, auth_token);
+    } catch (error) {
+      console.error('Failed to search users:', error);
+      throw error;
+    }
+  }
+
   async registerUser(data: RegisterData) {
     return this.api.post(
       'api/users/register',

@@ -1,5 +1,5 @@
 import { Tabs, useRouter } from 'expo-router'
-import React from 'react'
+import React, { useState } from 'react'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { TouchableOpacity, View } from 'react-native'
 import { Icon } from '@/components/ui/icon'
@@ -10,115 +10,213 @@ import { useAuth } from '@/contexts/AuthContext'
 
 const TabLayout = () => {
   const colorScheme = useColorScheme()
+  const [reelPreference, setReelPreference] = useState<string>('fyp')
   const router = useRouter()
   const { removeToken } = useAuth()
   return (
-    <Tabs screenOptions={{ 
-      headerShown: true,
-      
-      tabBarActiveTintColor: colorScheme === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)',
-      tabBarInactiveTintColor: colorScheme === 'dark' ? 'white' : 'black',
-    }}
+    <Tabs
+      screenOptions={{
+        headerShown: true,
+        tabBarActiveTintColor: colorScheme === 'dark' ? 'rgb(52, 199, 89)' : 'rgb(48, 209, 88)',
+        tabBarInactiveTintColor: colorScheme === 'dark' ? 'white' : 'black',
+      }}
     >
-        <Tabs.Screen name="feed/index" options={{ tabBarLabel: 'Feed', headerTitle: '', headerTransparent: true, headerLeft: () => (
-          <TouchableOpacity className="p-2.5">
-            <Text>Home</Text>
-          </TouchableOpacity>
-        ), tabBarIcon: ({ color, size }) => (
-          <Icon name={Home} size={size} color={color} />
-        ), headerRight: () => (
-        <View className="flex-row items-center gap-3">
-          <TouchableOpacity className="p-2.5" onPress={() => router.push('/(main)/(create)/post')}>
-            <Icon name={Plus} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-          </TouchableOpacity>
-          <TouchableOpacity className="p-2.5">
-            <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-          </TouchableOpacity>
-          <TouchableOpacity className="p-2.5">
-            <Icon name={MessageCircle} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-          </TouchableOpacity>
-        </View>
-      )}} />
-        <Tabs.Screen name="friends/index" options={{ tabBarLabel: 'Friends', headerTitle: '', headerTransparent: true, headerLeft: () => (
-          <TouchableOpacity className="p-2.5">
-            <Text>Friends</Text>
-          </TouchableOpacity>
-        ), headerRight: () => (
-          <TouchableOpacity className="p-2.5">
-            <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-          </TouchableOpacity>
-        ), tabBarIcon: ({ color, size }) => (
-          <Icon name={Users} size={size} color={color} />
-        )}} />
-        <Tabs.Screen name="reels/index" options={{ tabBarLabel: 'Reels', headerTitle: '', headerTransparent: true, headerLeft: () => (
-          <TabsComponent defaultValue='tab1'>
-            <TabsList style={{ backgroundColor: 'transparent' }}>
-              <TabsTrigger value='tab1'>For You</TabsTrigger>
-              <TabsTrigger value='tab2'>Explore</TabsTrigger>
-            </TabsList>
-          </TabsComponent>
-        ), headerRight: () => (
-          <>
+      <Tabs.Screen
+        name="feed/index"
+        options={{
+          tabBarLabel: 'Feed',
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => (
+            <Text className='m-2.5'>Home</Text>
+          ),
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={Home} size={size} color={color} />
+          ),
+          headerRight: () => (
+            <View className="flex-row items-center gap-3">
+              <TouchableOpacity
+                className="p-2.5"
+                onPress={() => router.push('/(main)/(create)/post')}
+              >
+                <Icon
+                  as={Plus}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity className="p-2.5" onPress={() => router.push('/(main)/(chats)/main')}>
+                <Icon
+                  as={MessageCircle}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="friends/index"
+        options={{
+          tabBarLabel: 'Friends',
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => (
+            <TouchableOpacity className="p-2.5">
+              <Text className='text-black dark:text-white'>Friends</Text>
+            </TouchableOpacity>
+          ),
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={Users} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="reels/index"
+        options={{
+          tabBarLabel: 'Reels',
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => (
+            <TabsComponent value={reelPreference} onValueChange={setReelPreference}>
+              <TabsList style={{ backgroundColor: 'transparent' }}>
+                <TabsTrigger value="fyp"><Text>For You</Text></TabsTrigger>
+                <TabsTrigger value="explore"><Text>Explore</Text></TabsTrigger>
+              </TabsList>
+            </TabsComponent>
+          ),
+          headerRight: () => (
+            <>
               <TouchableOpacity className="p-2.5">
-                <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                <Icon
+                  as={Search}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
               </TouchableOpacity>
               <TouchableOpacity className="p-2.5">
-                <Icon name={User} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                <Icon
+                  as={User}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
               </TouchableOpacity>
-          </>
-        ), tabBarIcon: ({ color, size }) => (
-          <Icon name={Video} size={size} color={color} />
-        )}} />
-        <Tabs.Screen name="profile/index" options={{ tabBarLabel: 'Profile', headerTransparent: true, headerTitle: '', headerRight: () => (
-          <>
+            </>
+          ),
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={Video} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile/index"
+        options={{
+          tabBarLabel: 'Profile',
+          headerTransparent: true,
+          headerTitle: '',
+          headerRight: () => (
+            <>
+              <TouchableOpacity className="p-2.5">
+                <Icon
+                  as={Pencil}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity className="p-2.5">
+                <Icon
+                  as={Search}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity className="p-2.5">
+                <Icon
+                  as={LogOut}
+                  size={24}
+                  onPress={async () => {
+                    removeToken()
+                    router.replace('/')
+                  }}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+            </>
+          ),
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={User} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notifications/index"
+        options={{
+          tabBarLabel: 'Activity',
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => (
             <TouchableOpacity className="p-2.5">
-              <Icon name={Pencil} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+              <Text>Notifications</Text>
             </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <>
+              <TouchableOpacity className="p-2.5">
+                <Icon
+                  as={Ellipsis}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity className="p-2.5">
+                <Icon
+                  as={Search}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+            </>
+          ),
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={Bell} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="menu/index"
+        options={{
+          tabBarLabel: 'Menu',
+          headerTitle: '',
+          headerTransparent: true,
+          headerLeft: () => (
             <TouchableOpacity className="p-2.5">
-              <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+              <Text>Menu</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="p-2.5">
-              <Icon name={LogOut} size={24} onPress={async () => {
-                removeToken()
-                router.replace('/')
-              }} color={colorScheme === 'dark' ? 'white' : 'black'} />
-            </TouchableOpacity>
-          </>
-        ), tabBarIcon: ({ color, size }) => (
-          <Icon name={User} size={size} color={color} />
-        )}} />
-        <Tabs.Screen name="notifications/index" options={{ tabBarLabel: 'Activity', headerTitle: '', headerTransparent: true, headerLeft: () => ( 
-          <TouchableOpacity className="p-2.5">
-            <Text>Notifications</Text>
-          </TouchableOpacity>
-        ), headerRight: () => (
-          <>
-            <TouchableOpacity className="p-2.5">
-              <Icon name={Ellipsis} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-            </TouchableOpacity>
-            <TouchableOpacity className="p-2.5">
-              <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-            </TouchableOpacity>
-          </>
-        ), tabBarIcon: ({ color, size }) => (
-          <Icon name={Bell} size={size} color={color} />
-        )}} />
-        <Tabs.Screen name="menu/index" options={{ tabBarLabel: 'Menu', headerTitle: '', headerTransparent: true, headerLeft: () => (
-          <TouchableOpacity className="p-2.5">
-            <Text>Menu</Text>
-          </TouchableOpacity>
-        ), headerRight: () => (
-          <>
-            <TouchableOpacity className="p-2.5">
-              <Icon name={Settings} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-            </TouchableOpacity>
-            <TouchableOpacity className="p-2.5">
-              <Icon name={Search} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-            </TouchableOpacity>
-          </>
-        ), tabBarIcon: ({ color, size }) => (
-          <Icon name={AlignJustify} size={size} color={color} />
-        )}} />
+          ),
+          headerRight: () => (
+            <>
+              <TouchableOpacity className="p-2.5">
+                <Icon
+                  as={Settings}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity className="p-2.5">
+                <Icon
+                  as={Search}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
+            </>
+          ),
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={AlignJustify} size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   )
 }
