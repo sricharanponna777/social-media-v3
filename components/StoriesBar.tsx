@@ -3,6 +3,7 @@ import { View, FlatList, Text, TouchableOpacity } from 'react-native';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'expo-router';
 import { API_URL } from '@/constants';
+import { LiquidGlassView } from '@/modules/liquid-glass-view';
 
 export interface StoryItem {
   id: string;
@@ -76,7 +77,9 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories }) => {
   if (!data.length) return null;
 
   return (
-    <View className='py-2.5 bg-zinc-200 dark:bg-zinc-800 rounded-3xl'>
+    <View
+      style={{ paddingVertical: 10, borderRadius: 24 }}
+    >
       <FlatList
         horizontal
         data={data}
@@ -88,6 +91,7 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories }) => {
         windowSize={7}
         getItemLayout={getItemLayout}
         removeClippedSubviews
+        contentContainerStyle={{ paddingHorizontal: 8 }}
       />
     </View>
   );

@@ -27,6 +27,13 @@ type SocketContextType = {
   onFriendRequestRejected: (callback: (data: FriendEvent) => void) => () => void;
   onFriendRemoved: (callback: (data: FriendEvent) => void) => () => void;
   onFriendBlocked: (callback: (data: FriendEvent) => void) => () => void;
+  // Chat API
+  sendMessage: (data: { conversationId: string; content: string; type?: 'text' | 'image' | 'video' | 'file' | 'audio'; mediaUrl?: string | null }) => void;
+  joinConversation: (conversationId: string) => void;
+  onNewMessage: (callback: (data: any) => void) => () => void;
+  onTypingStatus: (callback: (data: { userId: string; conversationId: string; isTyping: boolean }) => void) => () => void;
+  typingStart: (conversationId: string) => void;
+  typingStop: (conversationId: string) => void;
 };
 
 const SocketContext = createContext<SocketContextType>({
@@ -37,6 +44,12 @@ const SocketContext = createContext<SocketContextType>({
   onFriendRequestRejected: () => () => {},
   onFriendRemoved: () => () => {},
   onFriendBlocked: () => () => {},
+  sendMessage: () => {},
+  joinConversation: () => {},
+  onNewMessage: () => () => {},
+  onTypingStatus: () => () => {},
+  typingStart: () => {},
+  typingStop: () => {},
 });
 
 const SOCKET_URL = API_URL; // Change to your backend IP
@@ -79,6 +92,39 @@ export const SocketProvider = ({ token, children }: { token: string; children: R
 
     socket.on('friend_blocked', callback);
     return () => socket.off('friend_blocked', callback);
+  }, [socket]);
+
+  // Chat helpers
+  const sendMessage = useCallback((data: { conversationId: string; content: string; type?: 'text' | 'image' | 'video' | 'file' | 'audio'; mediaUrl?: string | null; }) => {
+    if (!socket) return;
+    socket.emit('send_message', data);
+  }, [socket]);
+
+  const joinConversation = useCallback((conversationId: string) => {
+    if (!socket) return;
+    socket.emit('join_conversation', { conversationId });
+  }, [socket]);
+
+  const onNewMessage = useCallback((callback: (data: any) => void) => {
+    if (!socket) return () => {};
+    socket.on('new_message', callback);
+    return () => socket.off('new_message', callback);
+  }, [socket]);
+
+  const onTypingStatus = useCallback((callback: (data: { userId: string; conversationId: string; isTyping: boolean }) => void) => {
+    if (!socket) return () => {};
+    socket.on('typing_status', callback);
+    return () => socket.off('typing_status', callback);
+  }, [socket]);
+
+  const typingStart = useCallback((conversationId: string) => {
+    if (!socket) return;
+    socket.emit('typing_start', { conversationId });
+  }, [socket]);
+
+  const typingStop = useCallback((conversationId: string) => {
+    if (!socket) return;
+    socket.emit('typing_stop', { conversationId });
   }, [socket]);
 
   // Connect socket on mount
@@ -131,7 +177,13 @@ export const SocketProvider = ({ token, children }: { token: string; children: R
       onFriendRequestAccepted,
       onFriendRequestRejected,
       onFriendRemoved,
-      onFriendBlocked
+      onFriendBlocked,
+      sendMessage,
+      joinConversation,
+      onNewMessage,
+      onTypingStatus,
+      typingStart,
+      typingStop,
     }}>
       {children}
     </SocketContext.Provider>

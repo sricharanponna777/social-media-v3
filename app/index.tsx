@@ -10,16 +10,16 @@ export default function WelcomeScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   console.log('Color scheme:', colorScheme);
-  const checkToken = async () => {
+
+  useEffect(() => {
+    const checkToken = async () => {
     const token = await AsyncStorage.getItem('auth_token');
     if (token) {
       router.replace('/feed');
     }
   }
-
-  useEffect(() => {
     checkToken();
-  }, []);
+  }, [router]);
   
   return (
     <View className="items-center justify-center flex-1 p-5">
@@ -28,7 +28,7 @@ export default function WelcomeScreen() {
       <Button
         onPress={() => router.replace('/login')} //
         // color="#007AFF" 
-        className="bg-green-500 dark:bg-green-600 rounded-[12.5%] mt-5"
+        className="w-40 mt-5 bg-green-500 rounded-xl dark:bg-green-600"
         variant={'ghost'}
       >
         <Text>Login</Text>
@@ -36,7 +36,7 @@ export default function WelcomeScreen() {
       <Button
         onPress={() => router.replace('/register')} //
         // color="#007AFF" 
-        className="bg-green-500 dark:bg-green-600 rounded-[12.5%] mt-5"
+        className="w-40 mt-5 bg-green-500 dark:bg-green-600 rounded-xl"
         variant={'ghost'}
       >
         <Text>Register</Text>

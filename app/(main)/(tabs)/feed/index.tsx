@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { FlashList } from '@shopify/flash-list';
 import apiService from '@/lib/api';
 import PostCard from '@/components/PostCard';
 import { useHeaderHeight } from "@react-navigation/elements";

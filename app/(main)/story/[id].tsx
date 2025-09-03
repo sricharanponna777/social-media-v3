@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import {
   Text,
   TouchableOpacity,
@@ -9,10 +9,13 @@ import {
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Icon } from '@/components/ui/icon'
-import { ArrowLeft } from 'lucide-react-native'
+import { ArrowLeft, Heart } from 'lucide-react-native'
+
 import apiService from '@/lib/api'
 import { API_URL } from '@/constants'
 import { Image } from 'expo-image'
+import { useAuth } from '@/contexts/AuthContext'
+
 
 interface Story {
   id: string
@@ -25,8 +28,18 @@ interface Story {
 export default function StoryView() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
+  const { user } = useAuth()
+  const userId = (user as any)?.id as string | undefined
   const [stories, setStories] = useState<Story[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [showReactions, setShowReactions] = useState(false)
+  type reactions = 'like' | 'love' | 'haha' | 'wow' | 'sad' | 'angry'
+  const reactionMap: Record<reactions, string> = {
+    like: '👍', love: '❤️', haha: '😂', wow: '😮', sad: '😢', angry: '😡'
+  }
+  const [selectedType, setSelectedType] = useState<reactions>('like')
+  const [ownType, setOwnType] = useState<reactions | null>(null)
+  const [counts, setCounts] = useState<Record<string, number>>({})
 
   const progress = useRef(new Animated.Value(0)).current
   const animationRef = useRef<Animated.CompositeAnimation | null>(null)
@@ -47,8 +60,6 @@ export default function StoryView() {
     loadStories()
   }, [id])
 
-  const story = stories[currentIndex]
-
   useEffect(() => {
     if (story) {
       apiService
@@ -57,24 +68,99 @@ export default function StoryView() {
     }
   }, [story])
 
-  const handleNext = () => {
-    if (currentIndex < stories.length - 1) {
-      setCurrentIndex((prev) => prev + 1)
-    } else {
-      router.back()
-    }
-  }
+  // const handleNext = () => {
+  //   if (currentIndex < stories.length - 1) {
+  //     setCurrentIndex((prev) => prev + 1)
+  //   } else {
+  //     router.back()
+  //   }
+  // }
 
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1)
-    } else {
-      router.back()
-    }
-  }
+  // const handlePrevious = () => {
+  //   if (currentIndex > 0) {
+  //     setCurrentIndex((prev) => prev - 1)
+  //   } else {
+  //     router.back()
+  //   }
+  // }
 
   // Animate progress
-  const startProgress = (duration: number) => {
+  
+  const story = stories[currentIndex]
+
+  const ensureCounts = useCallback(async () => {
+    if (!story) return
+    try {
+      const res = await apiService.getReactions('story', story.id)
+      const map: Record<string, number> = {}
+      if (Array.isArray((res as any)?.counts)) {
+        for (const it of (res as any).counts as any[]) {
+          if (typeof it?.name === 'string') map[it.name] = parseInt(String(it.count || 0), 10)
+        }
+      }
+      setCounts(map)
+      try {
+        const reactionsArr = (res as any)?.reactions as any[] | undefined
+        const mine = reactionsArr?.find((r) => r?.user_id === userId)
+        if (mine?.reaction_name) {
+          setOwnType(mine.reaction_name)
+          setSelectedType(mine.reaction_name)
+        } else {
+          setOwnType(null)
+        }
+      } catch {}
+    } catch {}
+  }, [story, userId])
+
+  useEffect(() => {
+    ensureCounts()
+  }, [ensureCounts])
+
+  const chooseReaction = useCallback(async (type: reactions) => {
+    if (!story) return
+    try {
+      await apiService.reactToStory(story.id, type)
+      setSelectedType(type)
+      setOwnType(type)
+      const res = await apiService.getReactions('story', story.id)
+      const map: Record<string, number> = {}
+      if (Array.isArray((res as any)?.counts)) {
+        for (const it of (res as any).counts as any[]) {
+          if (typeof it?.name === 'string') map[it.name] = parseInt(String(it.count || 0), 10)
+        }
+      }
+      setCounts(map)
+    } catch {}
+    finally {
+      setShowReactions(false)
+    }
+  }, [story])
+
+  const quickToggle = useCallback(async () => {
+    if (!story) return
+    try {
+      await ensureCounts()
+      if (!ownType) {
+        await chooseReaction('like')
+      } else if (ownType === 'like') {
+        await apiService.removeReaction('story', story.id)
+        setOwnType(null)
+        const res = await apiService.getReactions('story', story.id)
+        const map: Record<string, number> = {}
+        if (Array.isArray((res as any)?.counts)) {
+          for (const it of (res as any).counts as any[]) {
+            if (typeof it?.name === 'string') map[it.name] = parseInt(String(it.count || 0), 10)
+          }
+        }
+        setCounts(map)
+      } else {
+        await chooseReaction('like')
+      }
+    } catch {}
+  }, [ensureCounts, ownType, chooseReaction, story])
+  
+  useEffect(() => {
+    const startProgress = (duration: number) => {
     progress.setValue(0)
     animationRef.current = Animated.timing(progress, {
       toValue: 1,
@@ -86,10 +172,8 @@ export default function StoryView() {
       if (finished) router.back()
     })
   }
-
-  useEffect(() => {
     if (story) startProgress(story.duration)
-  }, [story])
+  }, [story, router, progress])
 
   const pauseProgress = () => {
     if (!isPaused.current && animationRef.current) {
@@ -173,6 +257,33 @@ export default function StoryView() {
           <Text className="text-lg text-white">{story.caption}</Text>
         </View>
       ) : null}
+
+
+      {/* Reaction Action */}
+      <View className="absolute items-center bottom-10 right-6">
+        <TouchableOpacity onPress={quickToggle} onLongPress={() => setShowReactions((v) => !v)}>
+          {ownType ? (
+            <Text className="text-2xl">{reactionMap[ownType]}</Text>
+          ) : (
+            <Icon as={Heart} size={26} color={'white'} />
+          )}
+        </TouchableOpacity>
+        <Text className="mt-1 text-xs text-white/90">{Object.values(counts).reduce((a, b) => a + b, 0)}</Text>
+      </View>
+
+      {/* Reactions popover */}
+      {showReactions && (
+        <View className="absolute flex-row items-center gap-3 px-3 py-2 rounded-full bg-black/40 bottom-24 right-6">
+          <TouchableOpacity onPress={() => chooseReaction('like')}><Text className="text-xl text-white">👍</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => chooseReaction('love')}><Text className="text-xl text-white">❤️</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => chooseReaction('haha')}><Text className="text-xl text-white">😂</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => chooseReaction('wow')}><Text className="text-xl text-white">😮</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => chooseReaction('sad')}><Text className="text-xl text-white">😢</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => chooseReaction('angry')}><Text className="text-xl text-white">😡</Text></TouchableOpacity>
+        </View>
+      )}
+
+      {/* No comments for stories */}
     </View>
   )
 }

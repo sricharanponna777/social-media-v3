@@ -5,10 +5,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { View, Pressable, LogBox, Alert, TextInput } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
 import { Text } from '@/components/ui/text';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 
 interface LoginFields {
   email: string;

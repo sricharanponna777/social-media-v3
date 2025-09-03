@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,10 @@ export default function CreateStoryScreen() {
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
   const [captionInputFocused, setCaptionInputFocused] = useState(false);
+  
+  useEffect(() => {
+    console.log('media', media)
+  }, [media])
 
   const pickMedia = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -22,7 +26,7 @@ export default function CreateStoryScreen() {
     });
 
     // CHANGE 2: Store the base64 data and remove the unused FormData code
-    if (!result.canceled && result.assets && result.assets.length > 0) {
+    if (!result.canceled && result.assets && result.assets.length > 0 && result.assets[0].base64) {
       const asset = result.assets[0];
       setMedia({
         uri: asset.uri,
@@ -68,11 +72,11 @@ export default function CreateStoryScreen() {
       )}
       {/* Use a more robust check for media object before trying to access its properties */}
       {(!captionInputFocused && media) && (
-        <View className='h-[200]'>
+        <View className='h-auto'>
           {media.type === 'image' ? (
             <Image source={{ uri: media.uri }} style={{ width: '100%', height: 200 }} />
           ) : (
-            <Text>Video selected: {media.uri.split('/').pop()}</Text>
+            <Text className='text-foreground'>Video selected: {media.uri.split('/').pop()}</Text>
           )}
         </View>
       )}

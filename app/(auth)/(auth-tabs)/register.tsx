@@ -5,8 +5,7 @@ import {
   Lock,
   Phone,
   Eye,
-  EyeOff,
-  Plus,
+  EyeOff
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from '@/components/ui/text';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 
 let colorScheme1;
 interface RegisterFields {

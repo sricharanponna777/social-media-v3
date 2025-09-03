@@ -10,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext'
 
 const TabLayout = () => {
   const colorScheme = useColorScheme()
-  const [reelPreference, setReelPreference] = useState<string>('fyp')
   const router = useRouter()
   const { removeToken } = useAuth()
   return (
@@ -78,16 +77,15 @@ const TabLayout = () => {
           tabBarLabel: 'Reels',
           headerTitle: '',
           headerTransparent: true,
-          headerLeft: () => (
-            <TabsComponent value={reelPreference} onValueChange={setReelPreference}>
-              <TabsList style={{ backgroundColor: 'transparent' }}>
-                <TabsTrigger value="fyp"><Text>For You</Text></TabsTrigger>
-                <TabsTrigger value="explore"><Text>Explore</Text></TabsTrigger>
-              </TabsList>
-            </TabsComponent>
-          ),
           headerRight: () => (
             <>
+              <TouchableOpacity className="p-2.5" onPress={() => router.push('/(main)/(create)/reel')}>
+                <Icon
+                  as={Plus}
+                  size={24}
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                />
+              </TouchableOpacity>
               <TouchableOpacity className="p-2.5">
                 <Icon
                   as={Search}

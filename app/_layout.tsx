@@ -11,13 +11,31 @@ import { SocketProvider } from '@/contexts/SocketContext';
 import { useColorScheme } from 'react-native';
 import apiService from '@/lib/api';
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://7e10365bc0eca8538e0947083d5a74a2@o4509768871772160.ingest.us.sentry.io/4509768883699712',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 function InnerLayout() {
   const insets = useSafeAreaInsets();
   const { token, isLoading, removeToken } = useAuth();
   const colorScheme = useColorScheme();
 
-  const validateToken = async () => {
+  useEffect(() => {
+    const validateToken = async () => {
     try {
       console.log(`Validating token: ${token}`);
       const response = await apiService.validateToken({ token });
@@ -32,12 +50,10 @@ function InnerLayout() {
       console.error('Token validation failed:', error);
     }
   };
-
-  useEffect(() => {
     if (token) {
       validateToken();
     }
-  }, [token]);
+  }, [token, removeToken]);
 
   if (isLoading) {
     return (
@@ -88,10 +104,10 @@ function InnerLayout() {
   );
 }
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   return (
     <AuthProvider>
       <InnerLayout />
     </AuthProvider>
   );
-}
+});

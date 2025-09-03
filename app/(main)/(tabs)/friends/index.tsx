@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, TouchableOpacity as Button, FlatList, View, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { Alert, TouchableOpacity as Button, FlatList, View, KeyboardAvoidingView, Platform, ListRenderItem } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import apiService from '@/lib/api';
 import { useSocket } from '@/contexts/SocketContext';
@@ -16,6 +16,7 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Input as TextInput } from '@/components/ui/input';
 import { debounce } from 'lodash';
+import { useRouter } from 'expo-router';
 
 // --- Interfaces (no change) ---
 interface FriendRequest {
@@ -27,7 +28,8 @@ interface FriendRequest {
 }
 
 interface User {
-  id: string;
+  id: string; // friendship id for friends list, user id for search
+  friend_id?: string; // actual user id of the friend (friends list only)
   username: string;
   avatar_url: string | null;
 }
@@ -48,8 +50,14 @@ type tabsValueT = 'search' | 'requests' | 'friends';
 // They receive all necessary data and functions as props.
 // =========================================================================
 
-const SearchComponent = React.memo(
-  ({ searchQuery, setSearchQuery, debouncedSearch, searchResults, renderSearchItem }: SearchComponentProps) => (
+const SearchComponent = memo(function SearchComponent({
+  searchQuery,
+  setSearchQuery,
+  debouncedSearch,
+  searchResults,
+  renderSearchItem,
+}: SearchComponentProps) {
+  return (
     <View>
       <View className="gap-4 p-4">
         <TextInput
@@ -69,7 +77,7 @@ const SearchComponent = React.memo(
       </View>
       <FlatList
         data={searchResults}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderSearchItem}
         keyboardShouldPersistTaps="handled"
         removeClippedSubviews
@@ -77,37 +85,51 @@ const SearchComponent = React.memo(
         maxToRenderPerBatch={12}
         windowSize={5}
         ListHeaderComponent={
-          <Text className="mb-6 ml-6 text-2xl font-bold text-foreground">Search Results</Text>
+          <Text className="mb-6 ml-6 text-2xl font-bold text-foreground">
+            Search Results
+          </Text>
         }
         ListEmptyComponent={
-          <Text className="mt-4 text-center text-opacity-50 text-foreground">No users found</Text>
+          <Text className="mt-4 text-center text-opacity-50 text-foreground">
+            No users found
+          </Text>
         }
       />
     </View>
-  )
-);
+  );
+});
 
-const IncomingFriendRequestsComponent = React.memo(({ incomingRequests, renderRequestItem }) => (
-  <FlatList
-    data={incomingRequests}
-    keyExtractor={(item) => item.id}
-    renderItem={renderRequestItem}
-    keyboardShouldPersistTaps="handled"
-    removeClippedSubviews
-    initialNumToRender={8}
-    maxToRenderPerBatch={12}
-    windowSize={5}
-    ListFooterComponent={<View className="py-4" />}
-    ListHeaderComponent={
-      <Text className="mt-6 mb-3 ml-6 text-xl font-bold text-black dark:text-white">
-        Incoming Friend Requests
-      </Text>
-    }
-    ListEmptyComponent={
-      <Text className="mt-4 text-center text-black dark:text-white">No incoming friend requests</Text>
-    }
-  />
-));
+
+const IncomingFriendRequestsComponent = React.memo(function IncomingFriendRequestsComponent({
+  incomingRequests,
+  renderRequestItem,
+}: {
+  incomingRequests: FriendRequest[];
+  renderRequestItem: ({ item }: { item: FriendRequest }) => React.ReactNode;
+}) {
+  return (
+    <FlatList
+      data={incomingRequests}
+      keyExtractor={(item) => item.id}
+      renderItem={renderRequestItem}
+      keyboardShouldPersistTaps="handled"
+      removeClippedSubviews
+      initialNumToRender={8}
+      maxToRenderPerBatch={12}
+      windowSize={5}
+      ListFooterComponent={<View className="py-4" />}
+      ListHeaderComponent={
+        <Text className="mt-6 mb-3 ml-6 text-xl font-bold text-black dark:text-white">
+          Incoming Friend Requests
+        </Text>
+      }
+      ListEmptyComponent={
+        <Text className="mt-4 text-center text-black dark:text-white">No incoming friend requests</Text>
+      }
+    />
+  );
+});
+
 
 // IMPROVEMENT 1: Outgoing requests should not have accept/reject buttons.
 // Create a separate, simpler render item for them.
@@ -118,53 +140,68 @@ const renderOutgoingRequestItem = ({ item }: { item: FriendRequest }) => (
     </View>
 );
 
+const OutgoingFriendRequestsComponent = React.memo(function OutgoingFriendRequestsComponent({
+  outgoingRequests,
+}: {
+  outgoingRequests: FriendRequest[];
+}) {
+  return (
+    <FlatList
+      data={outgoingRequests}
+      keyExtractor={(item) => item.id}
+      renderItem={renderOutgoingRequestItem}
+      keyboardShouldPersistTaps="handled"
+      removeClippedSubviews
+      initialNumToRender={8}
+      maxToRenderPerBatch={12}
+      windowSize={5}
+      ListFooterComponent={<View className="py-4" />}
+      ListHeaderComponent={
+        <Text className="mb-3 ml-6 text-xl font-bold text-black dark:text-white">
+          Outgoing Friend Requests
+        </Text>
+      }
+      ListEmptyComponent={
+        <Text className="mt-4 text-center text-black dark:text-white">No outgoing friend requests</Text>
+      }
+    />
+  );
+});
 
-const OutgoingFriendRequestsComponent = React.memo(({ outgoingRequests }) => (
-  <FlatList
-    data={outgoingRequests}
-    keyExtractor={(item) => item.id}
-    renderItem={renderOutgoingRequestItem} // Use the new render item
-    keyboardShouldPersistTaps="handled"
-    removeClippedSubviews
-    initialNumToRender={8}
-    maxToRenderPerBatch={12}
-    windowSize={5}
-    ListFooterComponent={<View className="py-4" />}
-    ListHeaderComponent={
-      <Text className="mb-3 ml-6 text-xl font-bold text-black dark:text-white">
-        Outgoing Friend Requests
-      </Text>
-    }
-    ListEmptyComponent={
-      <Text className="mt-4 text-center text-black dark:text-white">No outgoing friend requests</Text>
-    }
-  />
-));
-
-const FriendsComponent = React.memo(({ friends, renderFriendItem }) => (
-  <FlatList
-    data={friends}
-    keyExtractor={(item) => item.id}
-    renderItem={renderFriendItem as any}
-    keyboardShouldPersistTaps="handled"
-    removeClippedSubviews
-    initialNumToRender={10}
-    maxToRenderPerBatch={15}
-    windowSize={7}
-    ListHeaderComponent={
-      <Text className="mb-6 ml-6 text-2xl font-bold text-black dark:text-white">Friends</Text>
-    }
-    ListEmptyComponent={
-      <Text className="mt-4 text-center text-black dark:text-white">You have no friends yet.</Text>
-    }
-  />
-));
+const FriendsComponent = React.memo(function FriendsComponent({
+  friends,
+  renderFriendItem,
+}: {
+  friends: User[];
+  renderFriendItem: ({ item }: { item: User }) => React.ReactNode;
+}) {
+  return (
+    <FlatList
+      data={friends}
+      keyExtractor={(item) => item.id}
+      renderItem={renderFriendItem as any}
+      keyboardShouldPersistTaps="handled"
+      removeClippedSubviews
+      initialNumToRender={10}
+      maxToRenderPerBatch={15}
+      windowSize={7}
+      ListHeaderComponent={
+        <Text className="mb-6 ml-6 text-2xl font-bold text-black dark:text-white">Friends</Text>
+      }
+      ListEmptyComponent={
+        <Text className="mt-4 text-center text-black dark:text-white">You have no friends yet.</Text>
+      }
+    />
+  );
+});
 
 
 const FriendsScreen = () => {
+  const router = useRouter();
   const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
   const [outgoingRequests, setOutgoingRequests] = useState<FriendRequest[]>([]);
   const [friends, setFriends] = useState<User[]>([]);
+  const [privateConvoByFriendId, setPrivateConvoByFriendId] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [tabsValue, setTabsValue] = useState<tabsValueT>('search');
   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -219,12 +256,29 @@ const FriendsScreen = () => {
     }
   }, []);
 
+  const fetchPrivateConversations = useCallback(async () => {
+    try {
+      const convos: any[] = await apiService.getConversations(1, 100);
+      const map: Record<string, string> = {};
+      (Array.isArray(convos) ? convos : []).forEach((c: any) => {
+        if (c.type === 'private' && c.other_user_id) {
+          map[c.other_user_id] = c.id;
+        }
+      });
+      setPrivateConvoByFriendId(map);
+    } catch (e) {
+      console.error('Failed to load private conversations', e);
+      setPrivateConvoByFriendId({});
+    }
+  }, []);
+
   // Refresh whenever screen is focused (no change)
   useFocusEffect(
     useCallback(() => {
       fetchRequests();
       fetchFriends();
-    }, [fetchRequests, fetchFriends])
+      fetchPrivateConversations();
+    }, [fetchRequests, fetchFriends, fetchPrivateConversations])
   );
 
   // --- Socket listeners ---
@@ -270,7 +324,7 @@ const FriendsScreen = () => {
   ]);
 
   // --- Handlers (no change) ---
-  const handleAccept = async (id: string) => {
+  const handleAccept = useCallback(async (id: string) => {
     setIncomingRequests((prev) => prev.filter((r) => r.id !== id));
     try {
       await apiService.acceptFriendRequest(id);
@@ -279,9 +333,9 @@ const FriendsScreen = () => {
       console.error('Accept failed', error);
       fetchRequests(); // rollback
     }
-  };
+  }, [fetchFriends, fetchRequests]);
 
-  const handleReject = async (id: string) => {
+  const handleReject = useCallback(async (id: string) => {
     setIncomingRequests((prev) => prev.filter((r) => r.id !== id));
     try {
       await apiService.rejectFriendRequest(id);
@@ -289,9 +343,9 @@ const FriendsScreen = () => {
       console.error('Reject failed', error);
       fetchRequests(); // rollback
     }
-  };
+  }, [fetchRequests]);
 
-  const handleAddFriend = async (id: string) => {
+  const handleAddFriend = useCallback(async (id: string) => {
     try {
       const response = await apiService.sendFriendRequest(id);
       Alert.alert('Friend request sent', 'Friend request sent successfully');
@@ -301,11 +355,26 @@ const FriendsScreen = () => {
       console.error('Add friend failed', error);
       Alert.alert('Error', 'Failed to send friend request.');
     }
-  };
+  }, []);
+
+  const handleStartChat = useCallback(async (friend: User) => {
+    try {
+      const conv = await apiService.createConversation({
+        title: friend.username,
+        participants: [friend.friend_id],
+        type: 'private',
+      });
+      setPrivateConvoByFriendId((prev) => ({ ...prev, [friend.friend_id]: conv.id }));
+      router.push({ pathname: '/(main)/(chats)/[id]', params: { id: conv.id } });
+    } catch (error) {
+      console.error('Start chat failed', error);
+      Alert.alert('Error', 'Failed to start chat');
+    }
+  }, [router]);
 
   // --- Debounced search (no change) ---
   const debouncedSearch = useCallback(
-    debounce(async (query: string) => {
+    ()=>{debounce(async (query: string) => {
       if (!query.trim()) {
         setSearchResults([]);
         return;
@@ -316,9 +385,7 @@ const FriendsScreen = () => {
       } catch (error) {
         console.error('Search failed', error);
       }
-    }, 400),
-    []
-  );
+    }, 400)}, []);
 
   // --- Render Items (memoized with useCallback) ---
   const renderRequestItem = useCallback(
@@ -363,12 +430,25 @@ const FriendsScreen = () => {
   );
 
   const renderFriendItem = useCallback(
-    ({ item }: { item: User }) => (
-      <View className="flex-row items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-        <Text className="font-medium text-foreground">{item.username}</Text>
-      </View>
-    ),
-    []
+    ({ item }: { item: User }) => {
+      const existingConvoId = privateConvoByFriendId[item.friend_id];
+      const onPress = () => {
+        if (existingConvoId) {
+          router.push({ pathname: '/(main)/(chats)/[id]', params: { id: existingConvoId } });
+        } else {
+          handleStartChat(item);
+        }
+      };
+      return (
+        <View className="flex-row items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <Text className="font-medium text-foreground">{item.username}</Text>
+          <Button onPress={onPress} className="items-center justify-center h-auto px-4 py-2 bg-green-500 rounded-full">
+            <Text className="text-white">{existingConvoId ? 'Open Chat' : 'Message'}</Text>
+          </Button>
+        </View>
+      );
+    },
+    [privateConvoByFriendId, router, handleStartChat]
   );
 
   return (
